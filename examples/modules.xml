@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<exosettModel xmlns="https://exosett.org/xml/model/0.1"
+              xmlns:sketch="https://exosett.org/xml/app/sketch/0.1"
+              formatVersion="0.1.0">
+  <metadata>
+    <title>Three abstract accommodation modules</title>
+    <author>Example model author</author>
+  </metadata>
+  <frames>
+    <accommodationFrame id="accommodation-frame" widthCells="2" heightCells="2" depthCells="1"/>
+    <serviceFrame id="service-frame" accommodationFrameRef="accommodation-frame"
+                  widthCells="1" heightCells="2" depthCells="1"/>
+  </frames>
+  <moduleTypes>
+    <accommodationModuleType id="standard-module" name="Example module">
+      <description>An abstract example envelope, not a prescribed ExoSett size.</description>
+      <dimensions width="6.0" height="2.9" depth="3.0" unit="m"/>
+    </accommodationModuleType>
+  </moduleTypes>
+  <modulePlacements>
+    <accommodationModule id="module-1" typeRef="standard-module" frameRef="accommodation-frame" x="0" y="0" z="0"/>
+    <accommodationModule id="module-2" typeRef="standard-module" frameRef="accommodation-frame" x="1" y="0" z="0"/>
+    <accommodationModule id="module-3" typeRef="standard-module" frameRef="accommodation-frame" x="0" y="1" z="0"/>
+  </modulePlacements>
+  <applications>
+    <sketch:view camera="isometric"/>
+  </applications>
+</exosettModel>

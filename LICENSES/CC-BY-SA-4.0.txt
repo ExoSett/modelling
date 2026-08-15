@@ -1,0 +1,11 @@
+Creative Commons Attribution-ShareAlike 4.0 International
+
+Specifications and documentation in this repository are licensed under the
+Creative Commons Attribution-ShareAlike 4.0 International licence
+(SPDX identifier: CC-BY-SA-4.0).
+
+The complete legal code is available at:
+https://creativecommons.org/licenses/by-sa/4.0/legalcode
+
+This notice is not a substitute for the legal code at that address.
+

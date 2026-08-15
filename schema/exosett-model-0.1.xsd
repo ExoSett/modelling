@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:ex="https://exosett.org/xml/model/0.1"
+           targetNamespace="https://exosett.org/xml/model/0.1"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           version="0.1.0">
+
+  <xs:annotation>
+    <xs:documentation>ExoSett model interchange format, version 0.1.0.</xs:documentation>
+  </xs:annotation>
+
+  <xs:element name="exosettModel" type="ex:ModelType"/>
+
+  <xs:complexType name="ModelType">
+    <xs:sequence>
+      <xs:element name="metadata" type="ex:MetadataType" minOccurs="0"/>
+      <xs:element name="frames" type="ex:FramesType"/>
+      <xs:element name="moduleTypes" type="ex:ModuleTypesType" minOccurs="0"/>
+      <xs:element name="modulePlacements" type="ex:ModulePlacementsType" minOccurs="0"/>
+      <xs:element name="applications" type="ex:ApplicationsType" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="formatVersion" type="ex:FormatVersionType" use="required"/>
+  </xs:complexType>
+
+  <xs:simpleType name="FormatVersionType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="0.1.0"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="MetadataType">
+    <xs:sequence>
+      <xs:element name="title" type="xs:string" minOccurs="0"/>
+      <xs:element name="description" type="xs:string" minOccurs="0"/>
+      <xs:element name="author" type="xs:string" minOccurs="0"/>
+      <xs:element name="organisation" type="xs:string" minOccurs="0"/>
+      <xs:element name="designReference" type="ex:DesignReferenceType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="DesignReferenceType">
+    <xs:attribute name="authority" type="xs:string" use="required"/>
+    <xs:attribute name="family" type="xs:string"/>
+    <xs:attribute name="specification" type="xs:string"/>
+    <xs:attribute name="revision" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="FramesType">
+    <xs:sequence>
+      <xs:element name="accommodationFrame" type="ex:AccommodationFrameType"/>
+      <xs:element name="serviceFrame" type="ex:ServiceFrameType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="AccommodationFrameType">
+    <xs:attribute name="id" type="xs:ID" use="required"/>
+    <xs:attribute name="widthCells" type="xs:positiveInteger" use="required"/>
+    <xs:attribute name="heightCells" type="xs:positiveInteger" use="required"/>
+    <xs:attribute name="depthCells" type="xs:positiveInteger" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="ServiceFrameType">
+    <xs:attribute name="id" type="xs:ID" use="required"/>
+    <xs:attribute name="accommodationFrameRef" type="xs:IDREF" use="required"/>
+    <xs:attribute name="widthCells" type="xs:positiveInteger" use="required"/>
+    <xs:attribute name="heightCells" type="xs:positiveInteger" use="required"/>
+    <xs:attribute name="depthCells" type="xs:positiveInteger" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="ModuleTypesType">
+    <xs:sequence>
+      <xs:element name="accommodationModuleType" type="ex:ModuleType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ModuleType">
+    <xs:sequence>
+      <xs:element name="description" type="xs:string" minOccurs="0"/>
+      <xs:element name="dimensions" type="ex:DimensionsType" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:ID" use="required"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="DimensionsType">
+    <xs:attribute name="width" type="ex:PositiveDecimalType" use="required"/>
+    <xs:attribute name="height" type="ex:PositiveDecimalType" use="required"/>
+    <xs:attribute name="depth" type="ex:PositiveDecimalType" use="required"/>
+    <xs:attribute name="unit" type="ex:LengthUnitType" use="required"/>
+  </xs:complexType>
+
+  <xs:simpleType name="PositiveDecimalType">
+    <xs:restriction base="xs:decimal">
+      <xs:minExclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="LengthUnitType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="mm"/>
+      <xs:enumeration value="cm"/>
+      <xs:enumeration value="m"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="ModulePlacementsType">
+    <xs:sequence>
+      <xs:element name="accommodationModule" type="ex:ModulePlacementType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ModulePlacementType">
+    <xs:attribute name="id" type="xs:ID" use="required"/>
+    <xs:attribute name="typeRef" type="xs:IDREF" use="required"/>
+    <xs:attribute name="frameRef" type="xs:IDREF" use="required"/>
+    <xs:attribute name="x" type="xs:nonNegativeInteger" use="required"/>
+    <xs:attribute name="y" type="xs:nonNegativeInteger" use="required"/>
+    <xs:attribute name="z" type="xs:nonNegativeInteger" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="ApplicationsType">
+    <xs:sequence>
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>
