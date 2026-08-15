@@ -1,8 +1,37 @@
 # ExoSett Sketch
 
-ExoSett Sketch is the first anticipated application for the common ExoSett model format. It will eventually be a lightweight, static browser application for creating a simple configuration, inspecting an abstract rotatable 3D representation, and saving or loading the description as an ordinary `.xml` file.
+ExoSett Sketch is a lightweight, static browser application for creating and exploring a simple abstract ExoSett frame-pair model. It is the first producer and consumer of the common ExoSett XML format, not the owner of that format.
 
-Sketch is a producer and consumer of the format, not its owner. Core model concepts belong in the repository-level schema and documentation; Sketch-specific camera, rendering, and interface state belongs in namespaced application data.
+The initial application asks only for the number of accommodation-frame cells wide (1–20) and high (1–7). It renders an empty accommodation frame and its corresponding service frame, supports mouse and touch inspection, and can save or reload XML and download the current view as a PNG.
 
-No application framework or implementation has been selected or scaffolded yet. That decision is intentionally outside the initial repository setup.
+All modelling, rendering, and file handling happens in the browser. There is no server-side application. The production build is ordinary static HTML, CSS, and JavaScript.
 
+## Development
+
+From this directory:
+
+```sh
+npm install
+npm run dev
+```
+
+Useful checks are:
+
+```sh
+npm run check
+npm run test:e2e
+```
+
+`npm run build` writes the static production application to `dist/`.
+
+## Technology
+
+- TypeScript without a UI framework
+- Three.js for browser-side 3D rendering and orbit controls
+- Vite for development and static builds
+- Vitest for model and XML tests
+- Playwright for desktop and mobile browser smoke tests
+
+The renderer uses the provisional visual-study dimensions currently used by `exosett_cad`: a 2.798 m × 5.918 m × 3.487 m accommodation cell, a 1.6 m service-frame depth, and a 0.3 m inter-frame gap. These are Sketch defaults for an abstract model, not engineering requirements or a universal ExoSett specification. The module-size assumption is the ISO 668 1CCC envelope, although this first view leaves all accommodation cells empty.
+
+Camera state is saved in the Sketch application namespace. Core model data remains in the common modelling namespace so other applications can ignore Sketch-specific state.

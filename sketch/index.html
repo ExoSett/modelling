@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Create and explore a simple abstract ExoSett frame-pair model in your browser."
+    />
+    <title>ExoSett Sketch</title>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="brand-bar">
+        <a class="brand" href="https://www.exosett.com/" aria-label="ExoSett home">
+          <span class="brand-mark" aria-hidden="true">E</span>
+          <span>ExoSett</span>
+        </a>
+        <span class="product-name">Sketch</span>
+      </header>
+
+      <section class="workspace" aria-label="ExoSett model workspace">
+        <aside class="control-panel" aria-label="Model controls">
+          <div>
+            <p class="eyebrow">Frame pair</p>
+            <h1>Shape a simple building</h1>
+            <p class="intro">Choose the accommodation-frame grid, then explore it in 3D.</p>
+          </div>
+
+          <div class="dimension-controls">
+            <label for="cells-wide">
+              <span>Cells wide</span>
+              <span class="range">1–20</span>
+            </label>
+            <input
+              id="cells-wide"
+              name="cellsWide"
+              type="number"
+              min="1"
+              max="20"
+              step="1"
+              value="5"
+            />
+
+            <label for="cells-high">
+              <span>Cells high</span>
+              <span class="range">1–7</span>
+            </label>
+            <input
+              id="cells-high"
+              name="cellsHigh"
+              type="number"
+              min="1"
+              max="7"
+              step="1"
+              value="3"
+            />
+          </div>
+
+          <dl class="model-facts">
+            <div>
+              <dt>Module basis</dt>
+              <dd>ISO 1CCC</dd>
+            </div>
+            <div>
+              <dt>Accommodation grid</dt>
+              <dd id="model-size">14.0 × 10.5 m</dd>
+            </div>
+          </dl>
+
+          <div class="file-actions">
+            <button id="save-xml" type="button" class="primary">Save XML</button>
+            <button id="load-xml" type="button">Load XML</button>
+            <button id="save-png" type="button">Download PNG</button>
+            <button id="reset-view" type="button">Reset view</button>
+            <input id="xml-file" type="file" accept=".xml,application/xml,text/xml" hidden />
+          </div>
+
+          <p class="hint">
+            <span aria-hidden="true">↔</span> Drag to orbit · scroll or pinch to zoom · right-drag
+            to pan
+          </p>
+          <output id="status" class="status" aria-live="polite"></output>
+        </aside>
+
+        <section class="viewport-wrap" aria-label="Interactive 3D model">
+          <canvas id="viewport"></canvas>
+          <div class="viewport-key" aria-hidden="true">
+            <span><i class="swatch accommodation"></i>Accommodation frame</span>
+            <span><i class="swatch service"></i>Service frame</span>
+          </div>
+          <div id="webgl-error" class="webgl-error" hidden>
+            This browser could not start the 3D view. Please try a current browser with WebGL
+            enabled.
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

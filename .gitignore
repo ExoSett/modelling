@@ -1,0 +1,7 @@
+node_modules/
+sketch/dist/
+sketch/coverage/
+sketch/test-results/
+sketch/playwright-report/
+.DS_Store
+
