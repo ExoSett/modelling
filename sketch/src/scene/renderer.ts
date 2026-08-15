@@ -19,7 +19,7 @@ export class SketchRenderer {
       preserveDrawingBuffer: true,
     });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    this.renderer.setClearColor(0xf1eee7, 1);
+    this.renderer.setClearColor(0xf5f5f3, 1);
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFShadowMap;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -31,7 +31,7 @@ export class SketchRenderer {
     this.controls.screenSpacePanning = false;
     this.controls.addEventListener('change', () => this.requestRender());
 
-    this.scene.add(new THREE.HemisphereLight(0xfff7e7, 0x748487, 2.4));
+    this.scene.add(new THREE.HemisphereLight(0xffffff, 0x858585, 2.4));
     const sun = new THREE.DirectionalLight(0xffffff, 3.2);
     sun.position.set(-16, -20, 28);
     sun.castShadow = true;
@@ -46,13 +46,13 @@ export class SketchRenderer {
 
     const ground = new THREE.Mesh(
       new THREE.PlaneGeometry(180, 180),
-      new THREE.MeshStandardMaterial({ color: 0xdedbd2, roughness: 1 }),
+      new THREE.MeshStandardMaterial({ color: 0xededeb, roughness: 1 }),
     );
     ground.receiveShadow = true;
     ground.position.z = -0.12;
     this.scene.add(ground);
 
-    const grid = new THREE.GridHelper(180, 90, 0xb8b5ad, 0xcecbc3);
+    const grid = new THREE.GridHelper(180, 90, 0xb8b8b5, 0xd2d2cf);
     grid.rotation.x = Math.PI / 2;
     grid.position.z = -0.1;
     this.scene.add(grid);

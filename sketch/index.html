@@ -5,33 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Create and explore a simple abstract ExoSett frame-pair model in your browser."
+      content="Shape and explore a simple abstract ExoSett frame-pair model in your browser."
     />
-    <title>ExoSett Sketch</title>
+    <title>Sketch — ExoSett</title>
   </head>
   <body>
-    <main class="app-shell">
-      <header class="brand-bar">
-        <a class="brand" href="https://www.exosett.com/" aria-label="ExoSett home">
-          <span class="brand-mark" aria-hidden="true">E</span>
-          <span>ExoSett</span>
-        </a>
-        <span class="product-name">Sketch</span>
-      </header>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="sketch-wordmark" href="https://www.exosett.com/" aria-label="ExoSett home"
+          >ExoSett</a
+        >
+        <nav class="site-nav" aria-label="Primary navigation">
+          <a href="https://www.exosett.com/components/">Components</a>
+          <a href="https://www.exosett.com/design/" aria-current="page">Design</a>
+          <a href="https://www.exosett.com/stories/">Stories</a>
+          <a href="https://www.exosett.com/about/">About</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="site-main sketch-page" id="main-content">
+      <section class="sketch-intro">
+        <p class="sketch-eyebrow">ExoSett design</p>
+        <h1>Sketch</h1>
+        <p>
+          Shape a simple frame pair and explore the relationship between accommodation and service
+          frames.
+        </p>
+      </section>
 
       <section class="workspace" aria-label="ExoSett model workspace">
         <aside class="control-panel" aria-label="Model controls">
           <div>
-            <p class="eyebrow">Frame pair</p>
-            <h1>Shape a simple building</h1>
+            <p class="control-eyebrow">Frame pair</p>
+            <h2>Shape a simple building</h2>
             <p class="intro">Choose the accommodation-frame grid, then explore it in 3D.</p>
           </div>
 
           <div class="dimension-controls">
-            <label for="cells-wide">
-              <span>Cells wide</span>
-              <span class="range">1–20</span>
-            </label>
+            <label for="cells-wide"><span>Cells wide</span><span class="range">1–20</span></label>
             <input
               id="cells-wide"
               name="cellsWide"
@@ -41,11 +55,7 @@
               step="1"
               value="5"
             />
-
-            <label for="cells-high">
-              <span>Cells high</span>
-              <span class="range">1–7</span>
-            </label>
+            <label for="cells-high"><span>Cells high</span><span class="range">1–7</span></label>
             <input
               id="cells-high"
               name="cellsHigh"
@@ -95,7 +105,29 @@
           </div>
         </section>
       </section>
+
+      <p class="sketch-note">
+        Sketch is an abstract visual tool, not an engineering or compliance model.
+        <a href="https://github.com/ExoSett/modelling">Source and licence</a>.
+      </p>
     </main>
+
+    <footer class="site-footer">
+      <div class="site-footer__inner">
+        <a
+          class="sketch-wordmark sketch-wordmark--footer"
+          href="https://www.exosett.com/"
+          aria-label="ExoSett home"
+          >ExoSett</a
+        >
+        <div class="site-footer__details">
+          <p>A building system for modular accommodation.</p>
+          <p>
+            © 2026 ExoSett · Patent pending · <a href="mailto:info@exosett.com">info@exosett.com</a>
+          </p>
+        </div>
+      </div>
+    </footer>
 
     <script type="module" src="/src/main.ts"></script>
   </body>

@@ -1,7 +1,7 @@
 node_modules/
 sketch/dist/
+sketch/dist-embed/
 sketch/coverage/
 sketch/test-results/
 sketch/playwright-report/
 .DS_Store
-

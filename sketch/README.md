@@ -24,6 +24,8 @@ npm run test:e2e
 
 `npm run build` writes the static production application to `dist/`.
 
+`npm run build:embed` writes fixed-name `sketch.js` and `sketch.css` assets to `dist-embed/`. The ExoSett website deployment places those assets in `/design/sketch/assets/`; the website repository owns the surrounding page, navigation, metadata, and footer.
+
 ## Technology
 
 - TypeScript without a UI framework

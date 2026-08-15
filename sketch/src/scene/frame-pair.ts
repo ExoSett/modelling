@@ -5,19 +5,19 @@ const FRAME_PROFILE = 0.12;
 const NODE_SIZE = 0.19;
 
 const accommodationMaterial = new THREE.MeshStandardMaterial({
-  color: 0xe87233,
+  color: 0x202323,
   roughness: 0.55,
   metalness: 0.18,
 });
 
 const serviceMaterial = new THREE.MeshStandardMaterial({
-  color: 0x4b7f87,
+  color: 0x7b8584,
   roughness: 0.62,
   metalness: 0.12,
 });
 
 const nodeMaterial = new THREE.MeshStandardMaterial({
-  color: 0x26363a,
+  color: 0x050505,
   roughness: 0.5,
   metalness: 0.25,
 });
