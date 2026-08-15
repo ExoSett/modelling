@@ -10,3 +10,4 @@ Versions describe the semantics of the specification, not merely changes to the 
 
 Consumers should reject unsupported major versions. They should make an explicit compatibility decision for an unfamiliar minor version rather than silently treating it as equivalent. Patch versions within a supported major/minor family are intended to preserve meaning, though consumers may still report that the exact patch is unfamiliar.
 
+The exact version appears both in a schema filename such as `exosett-model-0.1.0.xsd` and in a document's `formatVersion` attribute. The modelling namespace is stable across minor and patch releases. Namespace strategy for a future major version will be decided when that version is designed.

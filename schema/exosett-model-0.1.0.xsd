@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:ex="https://exosett.org/xml/model/0.1"
-           targetNamespace="https://exosett.org/xml/model/0.1"
+           xmlns:ex="https://www.exosett.com/xml/model"
+           targetNamespace="https://www.exosett.com/xml/model"
            elementFormDefault="qualified"
            attributeFormDefault="unqualified"
            version="0.1.0">
@@ -15,7 +15,7 @@
   <xs:complexType name="ModelType">
     <xs:sequence>
       <xs:element name="metadata" type="ex:MetadataType" minOccurs="0"/>
-      <xs:element name="frames" type="ex:FramesType"/>
+      <xs:element name="framePairs" type="ex:FramePairsType"/>
       <xs:element name="moduleTypes" type="ex:ModuleTypesType" minOccurs="0"/>
       <xs:element name="modulePlacements" type="ex:ModulePlacementsType" minOccurs="0"/>
       <xs:element name="applications" type="ex:ApplicationsType" minOccurs="0"/>
@@ -46,26 +46,50 @@
     <xs:attribute name="revision" type="xs:string"/>
   </xs:complexType>
 
-  <xs:complexType name="FramesType">
+  <xs:complexType name="FramePairsType">
     <xs:sequence>
-      <xs:element name="accommodationFrame" type="ex:AccommodationFrameType"/>
-      <xs:element name="serviceFrame" type="ex:ServiceFrameType"/>
+      <xs:element name="framePair" type="ex:FramePairType" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="AccommodationFrameType">
+  <xs:complexType name="FramePairType">
+    <xs:sequence>
+      <xs:element name="placement" type="ex:FramePairPlacementType"/>
+      <xs:element name="grid" type="ex:GridType"/>
+      <xs:element name="accommodationFrame" type="ex:FrameType"/>
+      <xs:element name="serviceFrame" type="ex:FrameType"/>
+    </xs:sequence>
     <xs:attribute name="id" type="xs:ID" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="FramePairPlacementType">
+    <xs:attribute name="x" type="xs:decimal" use="required"/>
+    <xs:attribute name="y" type="xs:decimal" use="required"/>
+    <xs:attribute name="z" type="xs:decimal" use="required"/>
+    <xs:attribute name="unit" type="ex:LengthUnitType" use="required"/>
+    <xs:attribute name="rotation" type="ex:QuarterTurnType" use="required"/>
+  </xs:complexType>
+
+  <xs:simpleType name="QuarterTurnType">
+    <xs:restriction base="xs:nonNegativeInteger">
+      <xs:enumeration value="0"/>
+      <xs:enumeration value="90"/>
+      <xs:enumeration value="180"/>
+      <xs:enumeration value="270"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="GridType">
     <xs:attribute name="widthCells" type="xs:positiveInteger" use="required"/>
     <xs:attribute name="heightCells" type="xs:positiveInteger" use="required"/>
     <xs:attribute name="depthCells" type="xs:positiveInteger" use="required"/>
   </xs:complexType>
 
-  <xs:complexType name="ServiceFrameType">
+  <xs:complexType name="FrameType">
+    <xs:sequence>
+      <xs:element name="cellDimensions" type="ex:DimensionsType"/>
+    </xs:sequence>
     <xs:attribute name="id" type="xs:ID" use="required"/>
-    <xs:attribute name="accommodationFrameRef" type="xs:IDREF" use="required"/>
-    <xs:attribute name="widthCells" type="xs:positiveInteger" use="required"/>
-    <xs:attribute name="heightCells" type="xs:positiveInteger" use="required"/>
-    <xs:attribute name="depthCells" type="xs:positiveInteger" use="required"/>
   </xs:complexType>
 
   <xs:complexType name="ModuleTypesType">
@@ -77,7 +101,7 @@
   <xs:complexType name="ModuleType">
     <xs:sequence>
       <xs:element name="description" type="xs:string" minOccurs="0"/>
-      <xs:element name="dimensions" type="ex:DimensionsType" minOccurs="0"/>
+      <xs:element name="dimensions" type="ex:DimensionsType"/>
     </xs:sequence>
     <xs:attribute name="id" type="xs:ID" use="required"/>
     <xs:attribute name="name" type="xs:string" use="required"/>
@@ -113,7 +137,8 @@
   <xs:complexType name="ModulePlacementType">
     <xs:attribute name="id" type="xs:ID" use="required"/>
     <xs:attribute name="typeRef" type="xs:IDREF" use="required"/>
-    <xs:attribute name="frameRef" type="xs:IDREF" use="required"/>
+    <xs:attribute name="framePairRef" type="xs:IDREF" use="required"/>
+    <xs:attribute name="accommodationFrameRef" type="xs:IDREF" use="required"/>
     <xs:attribute name="x" type="xs:nonNegativeInteger" use="required"/>
     <xs:attribute name="y" type="xs:nonNegativeInteger" use="required"/>
     <xs:attribute name="z" type="xs:nonNegativeInteger" use="required"/>

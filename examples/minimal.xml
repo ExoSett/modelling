@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<exosettModel xmlns="https://exosett.org/xml/model/0.1"
+<exosettModel xmlns="https://www.exosett.com/xml/model"
               formatVersion="0.1.0">
   <metadata>
     <title>Minimal frame pair</title>
   </metadata>
-  <frames>
-    <accommodationFrame id="accommodation-frame" widthCells="2" heightCells="2" depthCells="1"/>
-    <serviceFrame id="service-frame" accommodationFrameRef="accommodation-frame"
-                  widthCells="1" heightCells="2" depthCells="1"/>
-  </frames>
+  <framePairs>
+    <framePair id="pair-1">
+      <placement x="0" y="0" z="0" unit="m" rotation="0"/>
+      <grid widthCells="2" heightCells="2" depthCells="1"/>
+      <accommodationFrame id="accommodation-frame-1">
+        <cellDimensions width="6.2" height="3.1" depth="3.2" unit="m"/>
+      </accommodationFrame>
+      <serviceFrame id="service-frame-1">
+        <cellDimensions width="6.2" height="3.1" depth="1.8" unit="m"/>
+      </serviceFrame>
+    </framePair>
+  </framePairs>
 </exosettModel>
 
