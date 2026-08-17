@@ -1,5 +1,12 @@
 import './styles.css';
-import { DEFAULT_MODEL, DIMENSIONS_METRES, LIMITS, type SketchModel } from './model/model';
+import {
+  DEFAULT_MODEL,
+  DIMENSIONS_METRES,
+  FACADE_STYLES,
+  LIMITS,
+  isFacadeStyleId,
+  type SketchModel,
+} from './model/model';
 import { createSketchXml, parseSketchXml } from './model/xml';
 import { SketchRenderer } from './scene/renderer';
 
@@ -12,6 +19,7 @@ function element<T extends HTMLElement>(id: string): T {
 const canvas = element<HTMLCanvasElement>('viewport');
 const widthInput = element<HTMLInputElement>('cells-wide');
 const heightInput = element<HTMLInputElement>('cells-high');
+const facadeSelect = element<HTMLSelectElement>('facade-style');
 const fileInput = element<HTMLInputElement>('xml-file');
 const status = element<HTMLOutputElement>('status');
 const modelSize = element<HTMLElement>('model-size');
@@ -39,10 +47,18 @@ function readInputs(): SketchModel | undefined {
   return { cellsWide, cellsHigh };
 }
 
+for (const style of FACADE_STYLES) {
+  const option = document.createElement('option');
+  option.value = style.id;
+  option.textContent = style.label;
+  facadeSelect.append(option);
+}
+
 function rebuildFromInputs(): void {
   const next = readInputs();
   if (!next || !renderer) return;
   model = next;
+  facadeSelect.value = '';
   renderer.setModel(model);
   updateFacts();
   announce(`${model.cellsWide} wide × ${model.cellsHigh} high`);
@@ -58,6 +74,21 @@ function download(content: string, type: string, filename: string): void {
 }
 
 for (const input of [widthInput, heightInput]) input.addEventListener('input', rebuildFromInputs);
+
+facadeSelect.addEventListener('change', () => {
+  if (!renderer) return;
+  const styleId = facadeSelect.value;
+  model = {
+    ...model,
+    facade: isFacadeStyleId(styleId) ? { styleId } : undefined,
+  };
+  renderer.setModel(model, renderer.cameraState());
+  announce(
+    model.facade
+      ? `${FACADE_STYLES.find((style) => style.id === model.facade?.styleId)?.label} on all cells`
+      : 'Façades removed',
+  );
+});
 
 element<HTMLButtonElement>('reset-view').addEventListener('click', () => {
   renderer?.resetView();
@@ -86,6 +117,7 @@ fileInput.addEventListener('change', async () => {
     model = loaded;
     widthInput.value = String(model.cellsWide);
     heightInput.value = String(model.cellsHigh);
+    facadeSelect.value = model.facade?.styleId ?? '';
     renderer.setModel(model, model.camera);
     updateFacts();
     announce(`Loaded ${file.name}`);

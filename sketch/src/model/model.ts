@@ -28,10 +28,27 @@ export interface CameraState {
   target: Vector3Data;
 }
 
+export const FACADE_STYLES = [
+  { id: 'brick-window', label: 'Brick with window', form: 'window', surface: 'brick' },
+  { id: 'stone-bars', label: 'Stone with barred window', form: 'barred-window', surface: 'stone' },
+  { id: 'timber-balcony', label: 'Timber with balcony', form: 'balcony', surface: 'timber' },
+] as const;
+
+export type FacadeStyleId = (typeof FACADE_STYLES)[number]['id'];
+
+export interface FacadeState {
+  styleId: FacadeStyleId;
+}
+
 export interface SketchModel {
   cellsWide: number;
   cellsHigh: number;
+  facade?: FacadeState;
   camera?: CameraState;
+}
+
+export function isFacadeStyleId(value: string): value is FacadeStyleId {
+  return FACADE_STYLES.some((style) => style.id === value);
 }
 
 export const DEFAULT_MODEL: SketchModel = {

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { DIMENSIONS_METRES, type SketchModel } from '../model/model';
+import { buildFacades } from './facades';
 
 const FRAME_PROFILE = 0.12;
 const NODE_SIZE = 0.19;
@@ -117,6 +118,8 @@ export function buildFramePair(model: SketchModel): THREE.Group {
   serviceFrame.name = 'service-frame';
 
   pair.add(accommodationFrame, serviceFrame);
+  const facades = buildFacades(model);
+  if (facades) pair.add(facades);
   pair.position.x = -(model.cellsWide * accommodation.width) / 2;
   pair.position.y = -(accommodation.depth + DIMENSIONS_METRES.interFrameGap + service.depth) / 2;
   return pair;

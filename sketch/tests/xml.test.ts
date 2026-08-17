@@ -25,6 +25,27 @@ describe('Sketch XML', () => {
     expect(xml).toContain('\n  <metadata>\n');
   });
 
+  it('round-trips the global Sketch façade choice', () => {
+    const model = {
+      cellsWide: 4,
+      cellsHigh: 2,
+      facade: { styleId: 'stone-bars' as const },
+    };
+    const xml = createSketchXml(model, camera);
+
+    expect(parseSketchXml(xml)).toEqual({ ...model, camera });
+    expect(xml).toContain('<sketch:facade styleRef="stone-bars"/>');
+  });
+
+  it('rejects an unsupported Sketch façade style', () => {
+    const xml = createSketchXml(
+      { cellsWide: 4, cellsHigh: 2, facade: { styleId: 'brick-window' } },
+      camera,
+    ).replace('styleRef="brick-window"', 'styleRef="unknown"');
+
+    expect(() => parseSketchXml(xml)).toThrow('façade style');
+  });
+
   it('rejects unsupported model shapes', () => {
     const xml = createSketchXml({ cellsWide: 5, cellsHigh: 3 }, camera);
     expect(() => parseSketchXml(xml.replace('depthCells="1"', 'depthCells="2"'))).toThrow(

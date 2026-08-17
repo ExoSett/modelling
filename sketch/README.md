@@ -2,7 +2,7 @@
 
 ExoSett Sketch is a lightweight, static browser application for creating and exploring a simple abstract ExoSett frame-pair model. It is the first producer and consumer of the common ExoSett XML format, not the owner of that format.
 
-The initial application asks only for the number of accommodation-frame cells wide (1–20) and high (1–7). It renders an empty accommodation frame and its corresponding service frame, supports mouse and touch inspection, and can save or reload XML and download the current view as a PNG.
+The initial application asks for the number of accommodation-frame cells wide (1–20) and high (1–7). It renders an empty accommodation frame and its corresponding service frame, supports mouse and touch inspection, and can save or reload XML and download the current view as a PNG. A single optional front-façade style can be applied to every accommodation-frame cell for quick visual studies.
 
 All modelling, rendering, and file handling happens in the browser. There is no server-side application. The production build is ordinary static HTML, CSS, and JavaScript.
 
@@ -36,4 +36,4 @@ npm run test:e2e
 
 The renderer uses the provisional visual-study dimensions currently used by `exosett_cad`: a 2.798 m × 5.918 m × 3.487 m accommodation cell, a 1.6 m service-frame depth, and a 0.3 m inter-frame gap. These are Sketch defaults for an abstract model, not engineering requirements or a universal ExoSett specification. The module-size assumption is the ISO 668 1CCC envelope, although this first view leaves all accommodation cells empty.
 
-Camera state is saved in the Sketch application namespace. Core model data remains in the common modelling namespace so other applications can ignore Sketch-specific state.
+Camera and façade-style state are saved in the Sketch application namespace. Core model data remains in the common modelling namespace so other applications can ignore Sketch-specific state. Changing the grid dimensions removes the façade selection.

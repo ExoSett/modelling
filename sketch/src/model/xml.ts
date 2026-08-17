@@ -1,6 +1,7 @@
 import {
   DIMENSIONS_METRES,
   FORMAT_VERSION,
+  isFacadeStyleId,
   LIMITS,
   MODEL_NAMESPACE,
   SKETCH_NAMESPACE,
@@ -56,6 +57,17 @@ function cameraFromXml(document: Document): CameraState | undefined {
   };
 }
 
+function facadeFromXml(document: Document): SketchModel['facade'] {
+  const facade = document.getElementsByTagNameNS(SKETCH_NAMESPACE, 'facade')[0];
+  if (!facade) return undefined;
+
+  const styleId = facade.getAttribute('styleRef');
+  if (!styleId || !isFacadeStyleId(styleId)) {
+    throw new Error('The Sketch façade style is missing or unsupported.');
+  }
+  return { styleId };
+}
+
 export function parseSketchXml(xml: string): SketchModel {
   const document = new DOMParser().parseFromString(xml, 'application/xml');
   const parserError = document.getElementsByTagName('parsererror')[0];
@@ -77,6 +89,7 @@ export function parseSketchXml(xml: string): SketchModel {
   const depth = requiredNumber(grid, 'depthCells');
   if (depth !== 1) throw new Error('This version of Sketch supports a frame depth of one cell.');
 
+  const facade = facadeFromXml(document);
   return {
     cellsWide: validateCellCount(
       requiredNumber(grid, 'widthCells'),
@@ -90,6 +103,7 @@ export function parseSketchXml(xml: string): SketchModel {
       LIMITS.maxHigh,
       'Cells high',
     ),
+    ...(facade ? { facade } : {}),
     camera: cameraFromXml(document),
   };
 }
@@ -193,6 +207,11 @@ function documentForModel(model: SketchModel, camera: CameraState): XMLDocument 
     cameraElement.setAttribute(name, String(Number(value.toFixed(6))));
   }
   sketchState.append(cameraElement);
+  if (model.facade) {
+    const facade = document.createElementNS(SKETCH_NAMESPACE, 'sketch:facade');
+    facade.setAttribute('styleRef', model.facade.styleId);
+    sketchState.append(facade);
+  }
   applications.append(sketchState);
   root.append(applications);
 

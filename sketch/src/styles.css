@@ -35,8 +35,36 @@ a {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
+}
+
+.facade-control {
+  display: grid;
+  gap: 8px;
+}
+
+.facade-control label {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.facade-control select {
+  width: 100%;
+  min-height: 46px;
+  padding: 7px 34px 7px 10px;
+  color: var(--colour-text);
+  background: var(--colour-background);
+  border: 1px solid var(--colour-rule-strong);
+  border-radius: 0;
+}
+
+.facade-control p {
+  margin: 0;
+  color: var(--colour-muted);
+  font-size: 0.75rem;
+  line-height: 1.45;
 }
 
 :focus-visible {

@@ -52,3 +52,23 @@ test('downloads XML and a PNG from the current model', async ({ page }) => {
   });
   expect([...header]).toEqual([137, 80, 78, 71, 13, 10, 26, 10]);
 });
+
+test('applies one façade style to all cells and clears it when the grid changes', async ({
+  page,
+}) => {
+  await page.goto('/');
+
+  await page.locator('#facade-style').selectOption('brick-window');
+  await expect(page.locator('#status')).toHaveText('Brick with window on all cells');
+
+  const facadeXmlPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Save XML' }).click();
+  const facadeXml = await facadeXmlPromise;
+  const stream = await facadeXml.createReadStream();
+  let xml = '';
+  for await (const chunk of stream) xml += chunk.toString();
+  expect(xml).toContain('<sketch:facade styleRef="brick-window"/>');
+
+  await page.locator('#cells-wide').fill('6');
+  await expect(page.locator('#facade-style')).toHaveValue('');
+});
