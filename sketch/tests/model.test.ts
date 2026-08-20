@@ -18,4 +18,13 @@ describe('model validation', () => {
     expect(() => validateModel({ cellsWide: 5, cellsHigh: 11 })).toThrow('Cells high');
     expect(() => validateModel({ cellsWide: 2.5, cellsHigh: 3 })).toThrow('whole number');
   });
+
+  it('validates the multi-pair layout and service-frame gap', () => {
+    expect(
+      validateModel({ cellsWide: 5, cellsHigh: 3, layout: 'double', serviceGap: 3 }),
+    ).toMatchObject({ layout: 'double', serviceGap: 3 });
+    expect(() =>
+      validateModel({ cellsWide: 5, cellsHigh: 3, layout: 'double', serviceGap: 4 }),
+    ).toThrow('Service-frame gap');
+  });
 });

@@ -45,6 +45,8 @@
           </div>
 
           <div class="dimension-controls">
+            <label for="building-layout"><span>Building layout</span></label>
+            <select id="building-layout" name="buildingLayout"></select>
             <label for="cells-wide"><span>Cells wide</span><span class="range">1–20</span></label>
             <input
               id="cells-wide"
@@ -65,6 +67,21 @@
               step="1"
               value="3"
             />
+            <div id="service-gap-control" class="conditional-control" hidden>
+              <label for="service-gap"
+                ><span>Service-frame gap</span><span class="range">0–3 module depths</span></label
+              >
+              <input
+                id="service-gap"
+                name="serviceGap"
+                type="number"
+                min="0"
+                max="3"
+                step="1"
+                value="0"
+              />
+              <p>Zero uses one shared service frame.</p>
+            </div>
           </div>
 
           <div class="facade-control">

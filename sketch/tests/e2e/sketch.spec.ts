@@ -3,12 +3,12 @@ import { expect, test } from '@playwright/test';
 test('updates the model dimensions and keeps controls usable', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Shape a simple building' })).toBeVisible();
-  await expect(page.locator('#status')).toHaveText('5 wide × 3 high');
+  await expect(page.locator('#status')).toHaveText('One pair: 5 wide × 3 high');
 
   await page.locator('#cells-wide').fill('8');
   await page.locator('#cells-high').fill('4');
 
-  await expect(page.locator('#status')).toHaveText('8 wide × 4 high');
+  await expect(page.locator('#status')).toHaveText('One pair: 8 wide × 4 high');
   await expect(page.locator('#model-size')).toHaveText('22.4 × 13.9 m');
   await expect(page.locator('#viewport')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Save XML' })).toBeEnabled();
@@ -24,7 +24,7 @@ test('supports ten cells high and marks dimensions beyond their limits in red', 
 
   await expect(heightInput).toHaveAttribute('max', '10');
   await heightInput.fill('10');
-  await expect(page.locator('#status')).toHaveText('5 wide × 10 high');
+  await expect(page.locator('#status')).toHaveText('One pair: 5 wide × 10 high');
 
   await heightInput.fill('11');
   await expect(heightInput).toHaveCSS('color', 'rgb(199, 37, 37)');
@@ -88,4 +88,21 @@ test('applies one façade style to all cells and clears it when the grid changes
 
   await page.locator('#cells-wide').fill('6');
   await expect(page.locator('#facade-style')).toHaveValue('');
+});
+
+test('switches between facing-pair and quadrangle layouts', async ({ page }) => {
+  await page.goto('/');
+  const layout = page.locator('#building-layout');
+  const gapControl = page.locator('#service-gap-control');
+  await page.locator('#facade-style').selectOption('timber-balcony');
+
+  await layout.selectOption('double');
+  await expect(gapControl).toBeVisible();
+  await expect(page.locator('#facade-style')).toHaveValue('timber-balcony');
+  await page.locator('#service-gap').fill('3');
+  await expect(page.locator('#status')).toHaveText('Two facing pairs: 5 wide × 3 high');
+
+  await layout.selectOption('quadrangle');
+  await expect(gapControl).toBeHidden();
+  await expect(page.locator('#status')).toHaveText('Four-pair quadrangle: 5 wide × 3 high');
 });

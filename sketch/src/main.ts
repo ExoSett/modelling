@@ -2,9 +2,11 @@ import './styles.css';
 import {
   DEFAULT_MODEL,
   DIMENSIONS_METRES,
+  BUILDING_LAYOUTS,
   FACADE_STYLES,
   LIMITS,
   isFacadeStyleId,
+  isBuildingLayout,
   type SketchModel,
 } from './model/model';
 import { createSketchXml, parseSketchXml } from './model/xml';
@@ -19,6 +21,9 @@ function element<T extends HTMLElement>(id: string): T {
 const canvas = element<HTMLCanvasElement>('viewport');
 const widthInput = element<HTMLInputElement>('cells-wide');
 const heightInput = element<HTMLInputElement>('cells-high');
+const layoutSelect = element<HTMLSelectElement>('building-layout');
+const serviceGapInput = element<HTMLInputElement>('service-gap');
+const serviceGapControl = element<HTMLElement>('service-gap-control');
 const facadeSelect = element<HTMLSelectElement>('facade-style');
 const fileInput = element<HTMLInputElement>('xml-file');
 const status = element<HTMLOutputElement>('status');
@@ -40,11 +45,26 @@ function updateFacts(): void {
 }
 
 function readInputs(): SketchModel | undefined {
-  if (!widthInput.checkValidity() || !heightInput.checkValidity()) return undefined;
+  if (
+    !widthInput.checkValidity() ||
+    !heightInput.checkValidity() ||
+    !serviceGapInput.checkValidity() ||
+    !isBuildingLayout(layoutSelect.value)
+  )
+    return undefined;
   const cellsWide = widthInput.valueAsNumber;
   const cellsHigh = heightInput.valueAsNumber;
   if (!Number.isInteger(cellsWide) || !Number.isInteger(cellsHigh)) return undefined;
-  return { cellsWide, cellsHigh };
+  const serviceGap = serviceGapInput.valueAsNumber;
+  if (!Number.isInteger(serviceGap)) return undefined;
+  return { cellsWide, cellsHigh, layout: layoutSelect.value, serviceGap, facade: model.facade };
+}
+
+for (const layout of BUILDING_LAYOUTS) {
+  const option = document.createElement('option');
+  option.value = layout.id;
+  option.textContent = layout.label;
+  layoutSelect.append(option);
 }
 
 for (const style of FACADE_STYLES) {
@@ -54,14 +74,20 @@ for (const style of FACADE_STYLES) {
   facadeSelect.append(option);
 }
 
-function rebuildFromInputs(): void {
+function rebuildFromInputs(clearFacade = false): void {
   const next = readInputs();
   if (!next || !renderer) return;
   model = next;
-  facadeSelect.value = '';
+  serviceGapControl.hidden = model.layout !== 'double';
+  if (clearFacade) {
+    model.facade = undefined;
+    facadeSelect.value = '';
+  }
   renderer.setModel(model);
   updateFacts();
-  announce(`${model.cellsWide} wide × ${model.cellsHigh} high`);
+  announce(
+    `${BUILDING_LAYOUTS.find((layout) => layout.id === model.layout)?.label}: ${model.cellsWide} wide × ${model.cellsHigh} high`,
+  );
 }
 
 function download(content: string, type: string, filename: string): void {
@@ -73,7 +99,10 @@ function download(content: string, type: string, filename: string): void {
   URL.revokeObjectURL(url);
 }
 
-for (const input of [widthInput, heightInput]) input.addEventListener('input', rebuildFromInputs);
+for (const input of [widthInput, heightInput])
+  input.addEventListener('input', () => rebuildFromInputs(true));
+serviceGapInput.addEventListener('input', () => rebuildFromInputs());
+layoutSelect.addEventListener('change', () => rebuildFromInputs());
 
 facadeSelect.addEventListener('change', () => {
   if (!renderer) return;
@@ -117,6 +146,9 @@ fileInput.addEventListener('change', async () => {
     model = loaded;
     widthInput.value = String(model.cellsWide);
     heightInput.value = String(model.cellsHigh);
+    layoutSelect.value = model.layout ?? 'single';
+    serviceGapInput.value = String(model.serviceGap);
+    serviceGapControl.hidden = model.layout !== 'double';
     facadeSelect.value = model.facade?.styleId ?? '';
     renderer.setModel(model, model.camera);
     updateFacts();
@@ -131,8 +163,10 @@ fileInput.addEventListener('change', async () => {
 try {
   renderer = new SketchRenderer(canvas);
   renderer.setModel(model);
+  layoutSelect.value = model.layout ?? 'single';
+  serviceGapInput.value = String(model.serviceGap);
   updateFacts();
-  announce(`${DEFAULT_MODEL.cellsWide} wide × ${DEFAULT_MODEL.cellsHigh} high`);
+  announce(`One pair: ${DEFAULT_MODEL.cellsWide} wide × ${DEFAULT_MODEL.cellsHigh} high`);
 } catch (error) {
   console.error(error);
   webglError.hidden = false;

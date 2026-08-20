@@ -7,6 +7,8 @@ export const LIMITS = {
   maxWide: 20,
   minHigh: 1,
   maxHigh: 10,
+  minServiceGap: 0,
+  maxServiceGap: 3,
 } as const;
 
 // Provisional visual-study values carried over from exosett_cad, not engineering requirements.
@@ -43,8 +45,22 @@ export interface FacadeState {
 export interface SketchModel {
   cellsWide: number;
   cellsHigh: number;
+  layout?: BuildingLayout;
+  serviceGap?: number;
   facade?: FacadeState;
   camera?: CameraState;
+}
+
+export const BUILDING_LAYOUTS = [
+  { id: 'single', label: 'One pair' },
+  { id: 'double', label: 'Two facing pairs' },
+  { id: 'quadrangle', label: 'Four-pair quadrangle' },
+] as const;
+
+export type BuildingLayout = (typeof BUILDING_LAYOUTS)[number]['id'];
+
+export function isBuildingLayout(value: string): value is BuildingLayout {
+  return BUILDING_LAYOUTS.some((layout) => layout.id === value);
 }
 
 export function isFacadeStyleId(value: string): value is FacadeStyleId {
@@ -54,6 +70,8 @@ export function isFacadeStyleId(value: string): value is FacadeStyleId {
 export const DEFAULT_MODEL: SketchModel = {
   cellsWide: 5,
   cellsHigh: 3,
+  layout: 'single',
+  serviceGap: 0,
 };
 
 export function validateCellCount(
@@ -69,9 +87,19 @@ export function validateCellCount(
 }
 
 export function validateModel(model: SketchModel): SketchModel {
+  const layout = model.layout ?? 'single';
+  if (!isBuildingLayout(layout)) throw new Error('Building layout is unsupported.');
+  const serviceGap = validateCellCount(
+    model.serviceGap ?? 0,
+    LIMITS.minServiceGap,
+    LIMITS.maxServiceGap,
+    'Service-frame gap',
+  );
   return {
     ...model,
     cellsWide: validateCellCount(model.cellsWide, LIMITS.minWide, LIMITS.maxWide, 'Cells wide'),
     cellsHigh: validateCellCount(model.cellsHigh, LIMITS.minHigh, LIMITS.maxHigh, 'Cells high'),
+    layout,
+    serviceGap,
   };
 }

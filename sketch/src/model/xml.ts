@@ -2,6 +2,7 @@ import {
   DIMENSIONS_METRES,
   FORMAT_VERSION,
   isFacadeStyleId,
+  isBuildingLayout,
   LIMITS,
   MODEL_NAMESPACE,
   SKETCH_NAMESPACE,
@@ -9,6 +10,7 @@ import {
   type SketchModel,
   validateCellCount,
 } from './model';
+import { pairPlacements } from '../scene/building';
 
 const XMLNS_NAMESPACE = 'http://www.w3.org/2000/xmlns/';
 
@@ -68,6 +70,21 @@ function facadeFromXml(document: Document): SketchModel['facade'] {
   return { styleId };
 }
 
+function layoutFromXml(document: Document): Pick<SketchModel, 'layout' | 'serviceGap'> {
+  const layout = document.getElementsByTagNameNS(SKETCH_NAMESPACE, 'layout')[0];
+  if (!layout) return { layout: 'single', serviceGap: 0 };
+  const type = layout.getAttribute('type');
+  if (!type || !isBuildingLayout(type))
+    throw new Error('The Sketch building layout is unsupported.');
+  const serviceGap = validateCellCount(
+    requiredNumber(layout, 'serviceGap'),
+    LIMITS.minServiceGap,
+    LIMITS.maxServiceGap,
+    'Service-frame gap',
+  );
+  return { layout: type, serviceGap };
+}
+
 export function parseSketchXml(xml: string): SketchModel {
   const document = new DOMParser().parseFromString(xml, 'application/xml');
   const parserError = document.getElementsByTagName('parsererror')[0];
@@ -82,27 +99,43 @@ export function parseSketchXml(xml: string): SketchModel {
   }
 
   const framePairs = document.getElementsByTagNameNS(MODEL_NAMESPACE, 'framePair');
-  if (framePairs.length !== 1)
-    throw new Error('This version of Sketch supports exactly one frame pair.');
+  const layout = layoutFromXml(document);
+  const expectedPairs = layout.layout === 'single' ? 1 : layout.layout === 'double' ? 2 : 4;
+  if (framePairs.length !== expectedPairs)
+    throw new Error(`The ${layout.layout} layout requires ${expectedPairs} frame pair(s).`);
 
   const grid = requiredElement(framePairs[0]!, MODEL_NAMESPACE, 'grid');
   const depth = requiredNumber(grid, 'depthCells');
   if (depth !== 1) throw new Error('This version of Sketch supports a frame depth of one cell.');
 
+  const cellsWide = validateCellCount(
+    requiredNumber(grid, 'widthCells'),
+    LIMITS.minWide,
+    LIMITS.maxWide,
+    'Cells wide',
+  );
+  const cellsHigh = validateCellCount(
+    requiredNumber(grid, 'heightCells'),
+    LIMITS.minHigh,
+    LIMITS.maxHigh,
+    'Cells high',
+  );
+  for (const framePair of Array.from(framePairs).slice(1)) {
+    const pairGrid = requiredElement(framePair, MODEL_NAMESPACE, 'grid');
+    if (
+      requiredNumber(pairGrid, 'widthCells') !== cellsWide ||
+      requiredNumber(pairGrid, 'heightCells') !== cellsHigh ||
+      requiredNumber(pairGrid, 'depthCells') !== 1
+    ) {
+      throw new Error('All Sketch frame pairs must use the same grid dimensions.');
+    }
+  }
+
   const facade = facadeFromXml(document);
   return {
-    cellsWide: validateCellCount(
-      requiredNumber(grid, 'widthCells'),
-      LIMITS.minWide,
-      LIMITS.maxWide,
-      'Cells wide',
-    ),
-    cellsHigh: validateCellCount(
-      requiredNumber(grid, 'heightCells'),
-      LIMITS.minHigh,
-      LIMITS.maxHigh,
-      'Cells high',
-    ),
+    cellsWide,
+    cellsHigh,
+    ...layout,
     ...(facade ? { facade } : {}),
     camera: cameraFromXml(document),
   };
@@ -137,6 +170,9 @@ function formatXml(xml: string): string {
 }
 
 function documentForModel(model: SketchModel, camera: CameraState): XMLDocument {
+  const layoutType = model.layout ?? 'single';
+  const serviceGap = model.serviceGap ?? 0;
+  const normalizedModel = { ...model, layout: layoutType, serviceGap };
   const document = documentImplementation();
   const root = document.documentElement;
   root.setAttributeNS(XMLNS_NAMESPACE, 'xmlns:sketch', SKETCH_NAMESPACE);
@@ -144,35 +180,43 @@ function documentForModel(model: SketchModel, camera: CameraState): XMLDocument 
 
   const metadata = document.createElementNS(MODEL_NAMESPACE, 'metadata');
   const title = document.createElementNS(MODEL_NAMESPACE, 'title');
-  title.textContent = `${model.cellsWide} × ${model.cellsHigh} ExoSett Sketch frame pair`;
+  const pairCount = layoutType === 'single' ? 1 : layoutType === 'double' ? 2 : 4;
+  title.textContent = `${model.cellsWide} × ${model.cellsHigh} ExoSett Sketch building (${pairCount} frame pair${pairCount === 1 ? '' : 's'})`;
   metadata.append(title);
   root.append(metadata);
 
   const framePairs = document.createElementNS(MODEL_NAMESPACE, 'framePairs');
-  const framePair = document.createElementNS(MODEL_NAMESPACE, 'framePair');
-  framePair.setAttribute('id', 'frame-pair-1');
-
-  const placement = document.createElementNS(MODEL_NAMESPACE, 'placement');
-  for (const [name, value] of Object.entries({ x: 0, y: 0, z: 0, rotation: 0 })) {
-    placement.setAttribute(name, String(value));
+  const width = model.cellsWide * DIMENSIONS_METRES.accommodationCell.width;
+  const depth =
+    DIMENSIONS_METRES.accommodationCell.depth +
+    DIMENSIONS_METRES.interFrameGap +
+    DIMENSIONS_METRES.serviceCell.depth;
+  for (const [index, pairPlacement] of pairPlacements(normalizedModel).entries()) {
+    const framePair = document.createElementNS(MODEL_NAMESPACE, 'framePair');
+    framePair.setAttribute('id', `frame-pair-${index + 1}`);
+    const placement = document.createElementNS(MODEL_NAMESPACE, 'placement');
+    const angle = (pairPlacement.rotation * Math.PI) / 180;
+    const localX = -width / 2;
+    const localY = -depth / 2;
+    const x = pairPlacement.x + localX * Math.cos(angle) - localY * Math.sin(angle);
+    const y = pairPlacement.y + localX * Math.sin(angle) + localY * Math.cos(angle);
+    for (const [name, value] of Object.entries({ x, y, z: 0, rotation: pairPlacement.rotation })) {
+      placement.setAttribute(name, String(Number(value.toFixed(6))));
+    }
+    placement.setAttribute('unit', 'm');
+    const grid = document.createElementNS(MODEL_NAMESPACE, 'grid');
+    grid.setAttribute('widthCells', String(model.cellsWide));
+    grid.setAttribute('heightCells', String(model.cellsHigh));
+    grid.setAttribute('depthCells', '1');
+    const accommodation = document.createElementNS(MODEL_NAMESPACE, 'accommodationFrame');
+    accommodation.setAttribute('id', `accommodation-frame-${index + 1}`);
+    addDimensions(document, accommodation, DIMENSIONS_METRES.accommodationCell);
+    const service = document.createElementNS(MODEL_NAMESPACE, 'serviceFrame');
+    service.setAttribute('id', `service-frame-${index + 1}`);
+    addDimensions(document, service, DIMENSIONS_METRES.serviceCell);
+    framePair.append(placement, grid, accommodation, service);
+    framePairs.append(framePair);
   }
-  placement.setAttribute('unit', 'm');
-
-  const grid = document.createElementNS(MODEL_NAMESPACE, 'grid');
-  grid.setAttribute('widthCells', String(model.cellsWide));
-  grid.setAttribute('heightCells', String(model.cellsHigh));
-  grid.setAttribute('depthCells', '1');
-
-  const accommodation = document.createElementNS(MODEL_NAMESPACE, 'accommodationFrame');
-  accommodation.setAttribute('id', 'accommodation-frame-1');
-  addDimensions(document, accommodation, DIMENSIONS_METRES.accommodationCell);
-
-  const service = document.createElementNS(MODEL_NAMESPACE, 'serviceFrame');
-  service.setAttribute('id', 'service-frame-1');
-  addDimensions(document, service, DIMENSIONS_METRES.serviceCell);
-
-  framePair.append(placement, grid, accommodation, service);
-  framePairs.append(framePair);
   root.append(framePairs);
 
   const moduleTypes = document.createElementNS(MODEL_NAMESPACE, 'moduleTypes');
@@ -207,6 +251,10 @@ function documentForModel(model: SketchModel, camera: CameraState): XMLDocument 
     cameraElement.setAttribute(name, String(Number(value.toFixed(6))));
   }
   sketchState.append(cameraElement);
+  const layout = document.createElementNS(SKETCH_NAMESPACE, 'sketch:layout');
+  layout.setAttribute('type', layoutType);
+  layout.setAttribute('serviceGap', String(serviceGap));
+  sketchState.append(layout);
   if (model.facade) {
     const facade = document.createElementNS(SKETCH_NAMESPACE, 'sketch:facade');
     facade.setAttribute('styleRef', model.facade.styleId);

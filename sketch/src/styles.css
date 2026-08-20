@@ -229,6 +229,41 @@ select {
   font-weight: 600;
 }
 
+.dimension-controls > label[for='building-layout'],
+.dimension-controls > select {
+  grid-column: 1 / -1;
+}
+
+.dimension-controls select {
+  width: 100%;
+  min-height: 46px;
+  padding: 7px 34px 7px 10px;
+  color: var(--colour-text);
+  background: var(--colour-background);
+  border: 1px solid var(--colour-rule-strong);
+  border-radius: 0;
+}
+
+.conditional-control {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: 1fr 82px;
+  gap: 8px 14px;
+  align-items: center;
+  padding-top: 4px;
+}
+
+.conditional-control[hidden] {
+  display: none;
+}
+
+.conditional-control p {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--colour-muted);
+  font-size: 0.75rem;
+}
+
 .range {
   color: var(--colour-muted);
   font-size: 0.75rem;

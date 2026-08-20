@@ -17,7 +17,13 @@ describe('Sketch XML', () => {
     const xml = createSketchXml({ cellsWide: 8, cellsHigh: 4 }, camera);
     const parsed = parseSketchXml(xml);
 
-    expect(parsed).toEqual({ cellsWide: 8, cellsHigh: 4, camera });
+    expect(parsed).toEqual({
+      cellsWide: 8,
+      cellsHigh: 4,
+      layout: 'single',
+      serviceGap: 0,
+      camera,
+    });
     expect(xml).toContain(`xmlns="${MODEL_NAMESPACE}"`);
     expect(xml).toContain(`xmlns:sketch="${SKETCH_NAMESPACE}"`);
     expect(xml).toContain(`formatVersion="${FORMAT_VERSION}"`);
@@ -33,8 +39,32 @@ describe('Sketch XML', () => {
     };
     const xml = createSketchXml(model, camera);
 
-    expect(parseSketchXml(xml)).toEqual({ ...model, camera });
+    expect(parseSketchXml(xml)).toEqual({
+      ...model,
+      layout: 'single',
+      serviceGap: 0,
+      camera,
+    });
     expect(xml).toContain('<sketch:facade styleRef="stone-bars"/>');
+  });
+
+  it('round-trips facing and quadrangle building layouts', () => {
+    const facing = { cellsWide: 6, cellsHigh: 3, layout: 'double' as const, serviceGap: 2 };
+    const facingXml = createSketchXml(facing, camera);
+    expect(parseSketchXml(facingXml)).toEqual({ ...facing, camera });
+    expect(facingXml.match(/<framePair /g)).toHaveLength(2);
+    expect(facingXml).toContain('<sketch:layout type="double" serviceGap="2"/>');
+
+    const quadrangle = {
+      cellsWide: 6,
+      cellsHigh: 3,
+      layout: 'quadrangle' as const,
+      serviceGap: 0,
+    };
+    const quadrangleXml = createSketchXml(quadrangle, camera);
+    expect(parseSketchXml(quadrangleXml)).toEqual({ ...quadrangle, camera });
+    expect(quadrangleXml.match(/<framePair /g)).toHaveLength(4);
+    expect(quadrangleXml).toContain('rotation="270"');
   });
 
   it('rejects an unsupported Sketch façade style', () => {

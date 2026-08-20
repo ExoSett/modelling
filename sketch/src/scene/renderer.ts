@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import type { CameraState, SketchModel } from '../model/model';
-import { buildFramePair, disposeFramePair } from './frame-pair';
+import { buildBuilding, disposeBuilding } from './building';
 
 export class SketchRenderer {
   private readonly scene = new THREE.Scene();
@@ -9,7 +9,7 @@ export class SketchRenderer {
   private readonly renderer: THREE.WebGLRenderer;
   private readonly controls: OrbitControls;
   private readonly resizeObserver: ResizeObserver;
-  private framePair?: THREE.Group;
+  private building?: THREE.Group;
   private requestedFrame?: number;
 
   constructor(private readonly canvas: HTMLCanvasElement) {
@@ -63,20 +63,20 @@ export class SketchRenderer {
   }
 
   setModel(model: SketchModel, cameraState?: CameraState): void {
-    if (this.framePair) {
-      this.scene.remove(this.framePair);
-      disposeFramePair(this.framePair);
+    if (this.building) {
+      this.scene.remove(this.building);
+      disposeBuilding(this.building);
     }
-    this.framePair = buildFramePair(model);
-    this.scene.add(this.framePair);
+    this.building = buildBuilding(model);
+    this.scene.add(this.building);
 
     if (cameraState) this.setCameraState(cameraState);
     else this.resetView();
   }
 
   resetView(): void {
-    if (!this.framePair) return;
-    const box = new THREE.Box3().setFromObject(this.framePair);
+    if (!this.building) return;
+    const box = new THREE.Box3().setFromObject(this.building);
     const sphere = box.getBoundingSphere(new THREE.Sphere());
     const radius = Math.max(sphere.radius, 3);
     const verticalFov = THREE.MathUtils.degToRad(this.camera.fov);

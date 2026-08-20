@@ -1,8 +1,8 @@
 # ExoSett Sketch
 
-ExoSett Sketch is a lightweight, static browser application for creating and exploring a simple abstract ExoSett frame-pair model. It is the first producer and consumer of the common ExoSett XML format, not the owner of that format.
+ExoSett Sketch is a lightweight, static browser application for creating and exploring simple abstract ExoSett buildings assembled from frame pairs. It is the first producer and consumer of the common ExoSett XML format, not the owner of that format.
 
-The initial application asks for the number of accommodation-frame cells wide (1–20) and high (1–10). It renders an empty accommodation frame and its corresponding service frame, supports mouse and touch inspection, and can save or reload XML and download the current view as a PNG. A single optional front-façade style can be applied to every accommodation-frame cell for quick visual studies.
+The application asks for the number of accommodation-frame cells wide (1–20) and high (1–10). It can arrange one pair, two pairs facing across a gap of 0–3 accommodation-module depths, or four equal pairs around a square quadrangle. A zero-width gap uses one shared service frame. Sketch supports mouse and touch inspection, can save or reload XML, and can download the current view as a PNG. A single optional front-façade style can be applied to every accommodation-frame cell for quick visual studies.
 
 All modelling, rendering, and file handling happens in the browser. There is no server-side application. The production build is ordinary static HTML, CSS, and JavaScript.
 
@@ -36,4 +36,4 @@ npm run test:e2e
 
 The renderer uses the provisional visual-study dimensions currently used by `exosett_cad`: a 2.798 m × 5.918 m × 3.487 m accommodation cell, a 1.6 m service-frame depth, and a 0.3 m inter-frame gap. These are Sketch defaults for an abstract model, not engineering requirements or a universal ExoSett specification. The module-size assumption is the ISO 668 1CCC envelope, although this first view leaves all accommodation cells empty.
 
-Camera and façade-style state are saved in the Sketch application namespace. Core model data remains in the common modelling namespace so other applications can ignore Sketch-specific state. Changing the grid dimensions removes the façade selection.
+Camera, layout controls, and façade-style state are saved in the Sketch application namespace. Each rendered pair and its placement are also written as core model data, allowing other applications to understand the arrangement while ignoring Sketch-specific state. Changing the grid dimensions removes the façade selection.
