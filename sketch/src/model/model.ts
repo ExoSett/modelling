@@ -6,7 +6,7 @@ export const LIMITS = {
   minWide: 1,
   maxWide: 20,
   minHigh: 1,
-  maxHigh: 7,
+  maxHigh: 10,
 } as const;
 
 // Provisional visual-study values carried over from exosett_cad, not engineering requirements.

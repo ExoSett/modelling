@@ -15,6 +15,23 @@ test('updates the model dimensions and keeps controls usable', async ({ page }) 
   await expect(page.getByRole('button', { name: 'Download PNG' })).toBeEnabled();
 });
 
+test('supports ten cells high and marks dimensions beyond their limits in red', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const widthInput = page.locator('#cells-wide');
+  const heightInput = page.locator('#cells-high');
+
+  await expect(heightInput).toHaveAttribute('max', '10');
+  await heightInput.fill('10');
+  await expect(page.locator('#status')).toHaveText('5 wide × 10 high');
+
+  await heightInput.fill('11');
+  await expect(heightInput).toHaveCSS('color', 'rgb(199, 37, 37)');
+  await widthInput.fill('21');
+  await expect(widthInput).toHaveCSS('color', 'rgb(199, 37, 37)');
+});
+
 test('downloads XML and a PNG from the current model', async ({ page }) => {
   await page.goto('/');
 
