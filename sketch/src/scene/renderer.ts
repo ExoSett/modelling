@@ -9,6 +9,7 @@ export class SketchRenderer {
   private readonly renderer: THREE.WebGLRenderer;
   private readonly controls: OrbitControls;
   private readonly resizeObserver: ResizeObserver;
+  private readonly sun = new THREE.DirectionalLight(0xffffff, 3.2);
   private building?: THREE.Group;
   private requestedFrame?: number;
 
@@ -32,17 +33,11 @@ export class SketchRenderer {
     this.controls.addEventListener('change', () => this.requestRender());
 
     this.scene.add(new THREE.HemisphereLight(0xffffff, 0x858585, 2.4));
-    const sun = new THREE.DirectionalLight(0xffffff, 3.2);
-    sun.position.set(-16, -20, 28);
-    sun.castShadow = true;
-    sun.shadow.mapSize.set(2048, 2048);
-    sun.shadow.camera.near = 1;
-    sun.shadow.camera.far = 100;
-    sun.shadow.camera.left = -35;
-    sun.shadow.camera.right = 35;
-    sun.shadow.camera.top = 35;
-    sun.shadow.camera.bottom = -35;
-    this.scene.add(sun);
+    this.sun.castShadow = true;
+    this.sun.shadow.mapSize.set(2048, 2048);
+    this.sun.shadow.bias = -0.0004;
+    this.sun.shadow.normalBias = 0.025;
+    this.scene.add(this.sun, this.sun.target);
 
     const ground = new THREE.Mesh(
       new THREE.PlaneGeometry(180, 180),
@@ -69,9 +64,31 @@ export class SketchRenderer {
     }
     this.building = buildBuilding(model);
     this.scene.add(this.building);
+    this.fitShadowCamera();
 
     if (cameraState) this.setCameraState(cameraState);
     else this.resetView();
+  }
+
+  private fitShadowCamera(): void {
+    if (!this.building) return;
+    const sphere = new THREE.Box3()
+      .setFromObject(this.building)
+      .getBoundingSphere(new THREE.Sphere());
+    const radius = Math.max(sphere.radius, 3);
+    const lightOffset = new THREE.Vector3(-16, -20, 28).normalize().multiplyScalar(radius * 2.5);
+    const extent = radius * 1.2;
+
+    this.sun.target.position.copy(sphere.center);
+    this.sun.position.copy(sphere.center).add(lightOffset);
+    this.sun.shadow.camera.left = -extent;
+    this.sun.shadow.camera.right = extent;
+    this.sun.shadow.camera.top = extent;
+    this.sun.shadow.camera.bottom = -extent;
+    this.sun.shadow.camera.near = Math.max(radius * 0.1, 0.5);
+    this.sun.shadow.camera.far = radius * 5;
+    this.sun.shadow.camera.updateProjectionMatrix();
+    this.sun.shadow.needsUpdate = true;
   }
 
   resetView(): void {

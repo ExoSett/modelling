@@ -3,6 +3,8 @@ import {
   FORMAT_VERSION,
   isFacadeStyleId,
   isBuildingLayout,
+  isRoofType,
+  normalizedRoofType,
   LIMITS,
   MODEL_NAMESPACE,
   SKETCH_NAMESPACE,
@@ -85,6 +87,19 @@ function layoutFromXml(document: Document): Pick<SketchModel, 'layout' | 'servic
   return { layout: type, serviceGap };
 }
 
+function roofFromXml(
+  document: Document,
+  model: Pick<SketchModel, 'layout' | 'serviceGap'>,
+): SketchModel['roof'] {
+  const roof = document.getElementsByTagNameNS(SKETCH_NAMESPACE, 'roof')[0];
+  if (!roof) return normalizedRoofType(model);
+  const type = roof.getAttribute('type');
+  if (!type || !isRoofType(type)) throw new Error('The Sketch roof type is unsupported.');
+  const normalized = normalizedRoofType({ ...model, roof: type });
+  if (normalized !== type) throw new Error('The Sketch roof type is not valid for this layout.');
+  return type;
+}
+
 export function parseSketchXml(xml: string): SketchModel {
   const document = new DOMParser().parseFromString(xml, 'application/xml');
   const parserError = document.getElementsByTagName('parsererror')[0];
@@ -132,11 +147,13 @@ export function parseSketchXml(xml: string): SketchModel {
   }
 
   const facade = facadeFromXml(document);
+  const roof = roofFromXml(document, layout);
   return {
     cellsWide,
     cellsHigh,
     ...layout,
     ...(facade ? { facade } : {}),
+    roof,
     camera: cameraFromXml(document),
   };
 }
@@ -173,6 +190,7 @@ function documentForModel(model: SketchModel, camera: CameraState): XMLDocument 
   const layoutType = model.layout ?? 'single';
   const serviceGap = model.serviceGap ?? 0;
   const normalizedModel = { ...model, layout: layoutType, serviceGap };
+  const roofType = normalizedRoofType(normalizedModel);
   const document = documentImplementation();
   const root = document.documentElement;
   root.setAttributeNS(XMLNS_NAMESPACE, 'xmlns:sketch', SKETCH_NAMESPACE);
@@ -255,6 +273,9 @@ function documentForModel(model: SketchModel, camera: CameraState): XMLDocument 
   layout.setAttribute('type', layoutType);
   layout.setAttribute('serviceGap', String(serviceGap));
   sketchState.append(layout);
+  const roof = document.createElementNS(SKETCH_NAMESPACE, 'sketch:roof');
+  roof.setAttribute('type', roofType);
+  sketchState.append(roof);
   if (model.facade) {
     const facade = document.createElementNS(SKETCH_NAMESPACE, 'sketch:facade');
     facade.setAttribute('styleRef', model.facade.styleId);

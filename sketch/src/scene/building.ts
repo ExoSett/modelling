@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { DIMENSIONS_METRES, type SketchModel } from '../model/model';
 import { buildFramePair, disposeFramePair } from './frame-pair';
+import { buildRoof, type RoofFootprint } from './roofs';
 
 export interface PairPlacement {
   x: number;
@@ -47,6 +48,31 @@ export function pairPlacements(model: SketchModel): PairPlacement[] {
   ];
 }
 
+export function buildingFootprint(model: SketchModel): RoofFootprint {
+  const width = model.cellsWide * DIMENSIONS_METRES.accommodationCell.width;
+  const depth =
+    DIMENSIONS_METRES.accommodationCell.depth +
+    DIMENSIONS_METRES.interFrameGap +
+    DIMENSIONS_METRES.serviceCell.depth;
+  const bounds = new THREE.Box2();
+  for (const placement of pairPlacements(model)) {
+    const angle = THREE.MathUtils.degToRad(placement.rotation);
+    for (const x of [-width / 2, width / 2]) {
+      for (const y of [-depth / 2, depth / 2]) {
+        bounds.expandByPoint(
+          new THREE.Vector2(
+            placement.x + x * Math.cos(angle) - y * Math.sin(angle),
+            placement.y + x * Math.sin(angle) + y * Math.cos(angle),
+          ),
+        );
+      }
+    }
+  }
+  const size = bounds.getSize(new THREE.Vector2());
+  const centre = bounds.getCenter(new THREE.Vector2());
+  return { width: size.x, depth: size.y, centreX: centre.x, centreY: centre.y };
+}
+
 export function buildBuilding(model: SketchModel): THREE.Group {
   const building = new THREE.Group();
   building.name = 'building';
@@ -59,6 +85,7 @@ export function buildBuilding(model: SketchModel): THREE.Group {
     instance.add(pair);
     building.add(instance);
   }
+  building.add(buildRoof(model, buildingFootprint(model)));
   return building;
 }
 

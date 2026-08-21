@@ -4,9 +4,13 @@ import {
   DIMENSIONS_METRES,
   BUILDING_LAYOUTS,
   FACADE_STYLES,
+  ROOF_TYPES,
   LIMITS,
   isFacadeStyleId,
   isBuildingLayout,
+  isRoofType,
+  allowedRoofTypes,
+  normalizedRoofType,
   type SketchModel,
 } from './model/model';
 import { createSketchXml, parseSketchXml } from './model/xml';
@@ -24,6 +28,8 @@ const heightInput = element<HTMLInputElement>('cells-high');
 const layoutSelect = element<HTMLSelectElement>('building-layout');
 const serviceGapInput = element<HTMLInputElement>('service-gap');
 const serviceGapControl = element<HTMLElement>('service-gap-control');
+const roofSelect = element<HTMLSelectElement>('roof-type');
+const roofHelp = element<HTMLElement>('roof-help');
 const facadeSelect = element<HTMLSelectElement>('facade-style');
 const fileInput = element<HTMLInputElement>('xml-file');
 const status = element<HTMLOutputElement>('status');
@@ -44,6 +50,23 @@ function updateFacts(): void {
   modelSize.textContent = `${width.toFixed(1)} × ${height.toFixed(1)} m`;
 }
 
+function updateRoofControl(): void {
+  const allowed = allowedRoofTypes(model);
+  const selected = normalizedRoofType(model);
+  roofSelect.replaceChildren();
+  for (const roof of ROOF_TYPES.filter((candidate) => allowed.includes(candidate.id))) {
+    const option = document.createElement('option');
+    option.value = roof.id;
+    option.textContent = roof.label;
+    roofSelect.append(option);
+  }
+  roofSelect.value = selected;
+  roofSelect.disabled = false;
+  roofHelp.textContent = allowed.includes('space-frame')
+    ? 'A space frame can cover the complete footprint and void.'
+    : 'Choose corrugated metal or a terracotta-tiled gable.';
+}
+
 function readInputs(): SketchModel | undefined {
   if (
     !widthInput.checkValidity() ||
@@ -57,7 +80,14 @@ function readInputs(): SketchModel | undefined {
   if (!Number.isInteger(cellsWide) || !Number.isInteger(cellsHigh)) return undefined;
   const serviceGap = serviceGapInput.valueAsNumber;
   if (!Number.isInteger(serviceGap)) return undefined;
-  return { cellsWide, cellsHigh, layout: layoutSelect.value, serviceGap, facade: model.facade };
+  return {
+    cellsWide,
+    cellsHigh,
+    layout: layoutSelect.value,
+    serviceGap,
+    facade: model.facade,
+    roof: isRoofType(roofSelect.value) ? roofSelect.value : model.roof,
+  };
 }
 
 for (const layout of BUILDING_LAYOUTS) {
@@ -78,7 +108,9 @@ function rebuildFromInputs(clearFacade = false): void {
   const next = readInputs();
   if (!next || !renderer) return;
   model = next;
+  model.roof = normalizedRoofType(model);
   serviceGapControl.hidden = model.layout !== 'double';
+  updateRoofControl();
   if (clearFacade) {
     model.facade = undefined;
     facadeSelect.value = '';
@@ -103,6 +135,13 @@ for (const input of [widthInput, heightInput])
   input.addEventListener('input', () => rebuildFromInputs(true));
 serviceGapInput.addEventListener('input', () => rebuildFromInputs());
 layoutSelect.addEventListener('change', () => rebuildFromInputs());
+
+roofSelect.addEventListener('change', () => {
+  if (!renderer || !isRoofType(roofSelect.value)) return;
+  model = { ...model, roof: roofSelect.value };
+  renderer.setModel(model, renderer.cameraState());
+  announce(`${ROOF_TYPES.find((roof) => roof.id === model.roof)?.label} roof selected`);
+});
 
 facadeSelect.addEventListener('change', () => {
   if (!renderer) return;
@@ -149,6 +188,7 @@ fileInput.addEventListener('change', async () => {
     layoutSelect.value = model.layout ?? 'single';
     serviceGapInput.value = String(model.serviceGap);
     serviceGapControl.hidden = model.layout !== 'double';
+    updateRoofControl();
     facadeSelect.value = model.facade?.styleId ?? '';
     renderer.setModel(model, model.camera);
     updateFacts();
@@ -165,6 +205,7 @@ try {
   renderer.setModel(model);
   layoutSelect.value = model.layout ?? 'single';
   serviceGapInput.value = String(model.serviceGap);
+  updateRoofControl();
   updateFacts();
   announce(`One pair: ${DEFAULT_MODEL.cellsWide} wide × ${DEFAULT_MODEL.cellsHigh} high`);
 } catch (error) {

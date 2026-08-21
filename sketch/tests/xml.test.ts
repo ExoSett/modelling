@@ -22,6 +22,7 @@ describe('Sketch XML', () => {
       cellsHigh: 4,
       layout: 'single',
       serviceGap: 0,
+      roof: 'none',
       camera,
     });
     expect(xml).toContain(`xmlns="${MODEL_NAMESPACE}"`);
@@ -43,6 +44,7 @@ describe('Sketch XML', () => {
       ...model,
       layout: 'single',
       serviceGap: 0,
+      roof: 'none',
       camera,
     });
     expect(xml).toContain('<sketch:facade styleRef="stone-bars"/>');
@@ -51,9 +53,10 @@ describe('Sketch XML', () => {
   it('round-trips facing and quadrangle building layouts', () => {
     const facing = { cellsWide: 6, cellsHigh: 3, layout: 'double' as const, serviceGap: 2 };
     const facingXml = createSketchXml(facing, camera);
-    expect(parseSketchXml(facingXml)).toEqual({ ...facing, camera });
+    expect(parseSketchXml(facingXml)).toEqual({ ...facing, roof: 'none', camera });
     expect(facingXml.match(/<framePair /g)).toHaveLength(2);
     expect(facingXml).toContain('<sketch:layout type="double" serviceGap="2"/>');
+    expect(facingXml).toContain('<sketch:roof type="none"/>');
 
     const quadrangle = {
       cellsWide: 6,
@@ -62,9 +65,22 @@ describe('Sketch XML', () => {
       serviceGap: 0,
     };
     const quadrangleXml = createSketchXml(quadrangle, camera);
-    expect(parseSketchXml(quadrangleXml)).toEqual({ ...quadrangle, camera });
+    expect(parseSketchXml(quadrangleXml)).toEqual({ ...quadrangle, roof: 'none', camera });
     expect(quadrangleXml.match(/<framePair /g)).toHaveLength(4);
     expect(quadrangleXml).toContain('rotation="270"');
+  });
+
+  it('round-trips a gable roof and rejects a roof invalid for its layout', () => {
+    const xml = createSketchXml(
+      { cellsWide: 5, cellsHigh: 3, layout: 'double', serviceGap: 0, roof: 'gable' },
+      camera,
+    );
+    expect(parseSketchXml(xml).roof).toBe('gable');
+    expect(xml).toContain('<sketch:roof type="gable"/>');
+
+    expect(() => parseSketchXml(xml.replace('serviceGap="0"', 'serviceGap="1"'))).toThrow(
+      'not valid for this layout',
+    );
   });
 
   it('rejects an unsupported Sketch façade style', () => {

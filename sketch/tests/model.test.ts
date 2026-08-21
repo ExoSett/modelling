@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { validateModel } from '../src/model/model';
+import { allowedRoofTypes, normalizedRoofType, validateModel } from '../src/model/model';
 
 describe('model validation', () => {
   it('accepts the supported boundary sizes', () => {
@@ -26,5 +26,24 @@ describe('model validation', () => {
     expect(() =>
       validateModel({ cellsWide: 5, cellsHigh: 3, layout: 'double', serviceGap: 4 }),
     ).toThrow('Service-frame gap');
+  });
+
+  it('offers roof types appropriate to the layout', () => {
+    expect(allowedRoofTypes({ layout: 'single', serviceGap: 0 })).toEqual([
+      'none',
+      'flat',
+      'gable',
+    ]);
+    expect(allowedRoofTypes({ layout: 'double', serviceGap: 0 })).toEqual([
+      'none',
+      'flat',
+      'gable',
+    ]);
+    expect(allowedRoofTypes({ layout: 'double', serviceGap: 1 })).toEqual(['none', 'space-frame']);
+    expect(allowedRoofTypes({ layout: 'quadrangle', serviceGap: 0 })).toEqual([
+      'none',
+      'space-frame',
+    ]);
+    expect(normalizedRoofType({ layout: 'double', serviceGap: 1, roof: 'gable' })).toBe('none');
   });
 });

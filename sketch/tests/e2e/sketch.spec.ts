@@ -98,11 +98,29 @@ test('switches between facing-pair and quadrangle layouts', async ({ page }) => 
 
   await layout.selectOption('double');
   await expect(gapControl).toBeVisible();
+  await expect(page.locator('#roof-type option')).toHaveText(['None', 'Flat', 'Gable']);
   await expect(page.locator('#facade-style')).toHaveValue('timber-balcony');
   await page.locator('#service-gap').fill('3');
+  await expect(page.locator('#roof-type option')).toHaveText(['None', 'Space frame']);
+  await expect(page.locator('#roof-type')).toHaveValue('none');
+  await expect(page.locator('#roof-type')).toBeEnabled();
   await expect(page.locator('#status')).toHaveText('Two facing pairs: 5 wide × 3 high');
 
   await layout.selectOption('quadrangle');
   await expect(gapControl).toBeHidden();
   await expect(page.locator('#status')).toHaveText('Four-pair quadrangle: 5 wide × 3 high');
+});
+
+test('selects and saves a gable roof', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('#roof-type').selectOption('gable');
+  await expect(page.locator('#status')).toHaveText('Gable roof selected');
+
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Save XML' }).click();
+  const download = await downloadPromise;
+  const stream = await download.createReadStream();
+  let xml = '';
+  for await (const chunk of stream) xml += chunk.toString();
+  expect(xml).toContain('<sketch:roof type="gable"/>');
 });

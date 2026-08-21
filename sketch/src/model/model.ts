@@ -48,7 +48,34 @@ export interface SketchModel {
   layout?: BuildingLayout;
   serviceGap?: number;
   facade?: FacadeState;
+  roof?: RoofType;
   camera?: CameraState;
+}
+
+export const ROOF_TYPES = [
+  { id: 'none', label: 'None' },
+  { id: 'flat', label: 'Flat' },
+  { id: 'gable', label: 'Gable' },
+  { id: 'space-frame', label: 'Space frame' },
+] as const;
+
+export type RoofType = (typeof ROOF_TYPES)[number]['id'];
+
+export function isRoofType(value: string): value is RoofType {
+  return ROOF_TYPES.some((roof) => roof.id === value);
+}
+
+export function allowedRoofTypes(model: Pick<SketchModel, 'layout' | 'serviceGap'>): RoofType[] {
+  return model.layout === 'quadrangle' || (model.layout === 'double' && (model.serviceGap ?? 0) > 0)
+    ? ['none', 'space-frame']
+    : ['none', 'flat', 'gable'];
+}
+
+export function normalizedRoofType(
+  model: Pick<SketchModel, 'layout' | 'serviceGap' | 'roof'>,
+): RoofType {
+  const allowed = allowedRoofTypes(model);
+  return model.roof && allowed.includes(model.roof) ? model.roof : allowed[0]!;
 }
 
 export const BUILDING_LAYOUTS = [
@@ -72,6 +99,7 @@ export const DEFAULT_MODEL: SketchModel = {
   cellsHigh: 3,
   layout: 'single',
   serviceGap: 0,
+  roof: 'none',
 };
 
 export function validateCellCount(
@@ -101,5 +129,6 @@ export function validateModel(model: SketchModel): SketchModel {
     cellsHigh: validateCellCount(model.cellsHigh, LIMITS.minHigh, LIMITS.maxHigh, 'Cells high'),
     layout,
     serviceGap,
+    roof: normalizedRoofType({ ...model, layout, serviceGap }),
   };
 }
