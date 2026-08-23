@@ -80,8 +80,8 @@ export function normalizedRoofType(
 
 export const BUILDING_LAYOUTS = [
   { id: 'single', label: 'One pair' },
-  { id: 'double', label: 'Two facing pairs' },
-  { id: 'quadrangle', label: 'Four-pair quadrangle' },
+  { id: 'double', label: 'Two pairs facing across a service space' },
+  { id: 'quadrangle', label: 'Four pairs around a courtyard' },
 ] as const;
 
 export type BuildingLayout = (typeof BUILDING_LAYOUTS)[number]['id'];

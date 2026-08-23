@@ -70,7 +70,7 @@ test('downloads XML and a PNG from the current model', async ({ page }) => {
   expect([...header]).toEqual([137, 80, 78, 71, 13, 10, 26, 10]);
 });
 
-test('applies one façade style to all cells and clears it when the grid changes', async ({
+test('applies one facade style to all cells and clears it when the grid changes', async ({
   page,
 }) => {
   await page.goto('/');
@@ -104,11 +104,15 @@ test('switches between facing-pair and quadrangle layouts', async ({ page }) => 
   await expect(page.locator('#roof-type option')).toHaveText(['None', 'Space frame']);
   await expect(page.locator('#roof-type')).toHaveValue('none');
   await expect(page.locator('#roof-type')).toBeEnabled();
-  await expect(page.locator('#status')).toHaveText('Two facing pairs: 5 wide × 3 high');
+  await expect(page.locator('#status')).toHaveText(
+    'Two pairs facing across a service space: 5 wide × 3 high',
+  );
 
   await layout.selectOption('quadrangle');
   await expect(gapControl).toBeHidden();
-  await expect(page.locator('#status')).toHaveText('Four-pair quadrangle: 5 wide × 3 high');
+  await expect(page.locator('#status')).toHaveText(
+    'Four pairs around a courtyard: 5 wide × 3 high',
+  );
 });
 
 test('selects and saves a gable roof', async ({ page }) => {

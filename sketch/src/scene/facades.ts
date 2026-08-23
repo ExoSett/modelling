@@ -8,6 +8,12 @@ import {
 
 const PANEL_DEPTH = 0.1;
 const FRONT_Y = -PANEL_DEPTH / 2 - 0.1;
+// Provisional finished-floor datum for an installed module within the cell.
+const BALCONY_FLOOR_SURFACE_Z = 0.18;
+const BALCONY_FLOOR_THICKNESS = 0.09;
+const BALCONY_GUARD_HEIGHT = 1.1;
+const BALCONY_RAIL_THICKNESS = 0.04;
+const BALCONY_MAX_OPENING = 0.1;
 
 const surfaces = {
   brick: new THREE.MeshStandardMaterial({ color: 0x9a513d, roughness: 0.92 }),
@@ -81,23 +87,31 @@ function addTimberJoints(group: THREE.Group, width: number, height: number): voi
   }
 }
 
-function addBalcony(group: THREE.Group, width: number, height: number): void {
+function addBalcony(group: THREE.Group, width: number): void {
   const balconyWidth = width * 0.78;
-  const floorZ = height * 0.32;
   const projection = 0.75;
   box(
     group,
-    [balconyWidth, projection, 0.09],
-    [width / 2, FRONT_Y - projection / 2, floorZ],
+    [balconyWidth, projection, BALCONY_FLOOR_THICKNESS],
+    [width / 2, FRONT_Y - projection / 2, BALCONY_FLOOR_SURFACE_Z - BALCONY_FLOOR_THICKNESS / 2],
     balconyMaterial,
   );
-  const railZ = floorZ + 0.55;
-  box(group, [balconyWidth, 0.035, 0.04], [width / 2, FRONT_Y - projection, railZ], darkMaterial);
-  for (let offset = -0.45; offset <= 0.45; offset += 0.15) {
+  const railCentreZ = BALCONY_FLOOR_SURFACE_Z + BALCONY_GUARD_HEIGHT - BALCONY_RAIL_THICKNESS / 2;
+  box(
+    group,
+    [balconyWidth, 0.035, BALCONY_RAIL_THICKNESS],
+    [width / 2, FRONT_Y - projection, railCentreZ],
+    darkMaterial,
+  );
+
+  const uprightHeight = BALCONY_GUARD_HEIGHT - BALCONY_RAIL_THICKNESS;
+  const openingCount = Math.ceil(balconyWidth / BALCONY_MAX_OPENING);
+  for (let index = 0; index <= openingCount; index += 1) {
+    const x = width / 2 - balconyWidth / 2 + (index * balconyWidth) / openingCount;
     box(
       group,
-      [0.025, 0.025, 0.55],
-      [width / 2 + offset * balconyWidth, FRONT_Y - projection, floorZ + 0.275],
+      [0.025, 0.025, uprightHeight],
+      [x, FRONT_Y - projection, BALCONY_FLOOR_SURFACE_Z + uprightHeight / 2],
       darkMaterial,
     );
   }
@@ -106,7 +120,7 @@ function addBalcony(group: THREE.Group, width: number, height: number): void {
 function buildCellFacade(styleId: FacadeStyleId): THREE.Group {
   const cell = DIMENSIONS_METRES.accommodationCell;
   const style = FACADE_STYLES.find((candidate) => candidate.id === styleId);
-  if (!style) throw new Error(`Unknown façade style: ${styleId}`);
+  if (!style) throw new Error(`Unknown facade style: ${styleId}`);
 
   const facade = new THREE.Group();
   box(
@@ -119,7 +133,7 @@ function buildCellFacade(styleId: FacadeStyleId): THREE.Group {
   if (style.surface === 'timber') addTimberJoints(facade, cell.width, cell.height);
   if (style.form === 'window') addWindow(facade, cell.width, cell.height, false);
   if (style.form === 'barred-window') addWindow(facade, cell.width, cell.height, true);
-  if (style.form === 'balcony') addBalcony(facade, cell.width, cell.height);
+  if (style.form === 'balcony') addBalcony(facade, cell.width);
   return facade;
 }
 

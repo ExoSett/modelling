@@ -67,7 +67,7 @@ function facadeFromXml(document: Document): SketchModel['facade'] {
 
   const styleId = facade.getAttribute('styleRef');
   if (!styleId || !isFacadeStyleId(styleId)) {
-    throw new Error('The Sketch façade style is missing or unsupported.');
+    throw new Error('The Sketch facade style is missing or unsupported.');
   }
   return { styleId };
 }

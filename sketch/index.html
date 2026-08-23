@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Shape and explore a simple abstract ExoSett frame-pair model in your browser."
+      content="Shape and explore simple ExoSett buildings made from accommodation frames, service frames and modular cells."
     />
     <title>Sketch — ExoSett</title>
   </head>
@@ -30,18 +30,22 @@
       <section class="sketch-intro">
         <p class="sketch-eyebrow">ExoSett design</p>
         <h1>Sketch</h1>
+        <p>Build simple ExoSett arrangements and explore them in 3D.</p>
         <p>
-          Shape a simple frame pair and explore the relationship between accommodation and service
-          frames.
+          Each frame pair combines an accommodation frame—the structure that holds the modules—with
+          an associated service frame for utilities and access.
         </p>
       </section>
 
       <section class="workspace" aria-label="ExoSett model workspace">
         <aside class="control-panel" aria-label="Model controls">
           <div>
-            <p class="control-eyebrow">Frame pair</p>
+            <p class="control-eyebrow">Building layout</p>
             <h2>Shape a simple building</h2>
-            <p class="intro">Choose the accommodation-frame grid, then explore it in 3D.</p>
+            <p class="intro">
+              Choose a layout, then set the number of accommodation cells in each frame. A cell is a
+              space that can receive a module.
+            </p>
           </div>
 
           <div class="dimension-controls">
@@ -69,7 +73,8 @@
             />
             <div id="service-gap-control" class="conditional-control" hidden>
               <label for="service-gap"
-                ><span>Service-frame gap</span><span class="range">0–3 module depths</span></label
+                ><span>Space between facing frames</span
+                ><span class="range">0–3 module depths</span></label
               >
               <input
                 id="service-gap"
@@ -80,7 +85,7 @@
                 step="1"
                 value="0"
               />
-              <p>Zero uses one shared service frame.</p>
+              <p>At zero, the two accommodation frames share one service frame.</p>
             </div>
           </div>
 
@@ -91,7 +96,7 @@
           </div>
 
           <div class="facade-control">
-            <label for="facade-style">Front façades</label>
+            <label for="facade-style">Accommodation facades</label>
             <select id="facade-style" name="facadeStyle">
               <option value="">None</option>
             </select>
@@ -100,11 +105,11 @@
 
           <dl class="model-facts">
             <div>
-              <dt>Module basis</dt>
-              <dd>ISO 1CCC</dd>
+              <dt>Reference module size</dt>
+              <dd>ISO 1CCC (20-foot High Cube envelope)</dd>
             </div>
             <div>
-              <dt>Accommodation grid</dt>
+              <dt>Frame width × height</dt>
               <dd id="model-size">14.0 × 10.5 m</dd>
             </div>
           </dl>
