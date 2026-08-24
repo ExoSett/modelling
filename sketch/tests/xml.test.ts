@@ -21,7 +21,7 @@ describe('Sketch XML', () => {
       cellsWide: 8,
       cellsHigh: 4,
       layout: 'single',
-      serviceGap: 0,
+      depth: 0,
       roof: 'none',
       camera,
     });
@@ -43,7 +43,7 @@ describe('Sketch XML', () => {
     expect(parseSketchXml(xml)).toEqual({
       ...model,
       layout: 'single',
-      serviceGap: 0,
+      depth: 0,
       roof: 'none',
       camera,
     });
@@ -51,34 +51,35 @@ describe('Sketch XML', () => {
   });
 
   it('round-trips facing and quadrangle building layouts', () => {
-    const facing = { cellsWide: 6, cellsHigh: 3, layout: 'double' as const, serviceGap: 2 };
+    const facing = { cellsWide: 6, cellsHigh: 3, layout: 'double' as const, depth: 2 };
     const facingXml = createSketchXml(facing, camera);
     expect(parseSketchXml(facingXml)).toEqual({ ...facing, roof: 'none', camera });
     expect(facingXml.match(/<framePair /g)).toHaveLength(2);
-    expect(facingXml).toContain('<sketch:layout type="double" serviceGap="2"/>');
+    expect(facingXml).toContain('<sketch:layout type="double" depth="2"/>');
     expect(facingXml).toContain('<sketch:roof type="none"/>');
 
     const quadrangle = {
       cellsWide: 6,
       cellsHigh: 3,
       layout: 'quadrangle' as const,
-      serviceGap: 0,
+      depth: 4,
     };
     const quadrangleXml = createSketchXml(quadrangle, camera);
     expect(parseSketchXml(quadrangleXml)).toEqual({ ...quadrangle, roof: 'none', camera });
     expect(quadrangleXml.match(/<framePair /g)).toHaveLength(4);
     expect(quadrangleXml).toContain('rotation="270"');
+    expect(quadrangleXml.match(/widthCells="4"/g)).toHaveLength(2);
   });
 
   it('round-trips a gable roof and rejects a roof invalid for its layout', () => {
     const xml = createSketchXml(
-      { cellsWide: 5, cellsHigh: 3, layout: 'double', serviceGap: 0, roof: 'gable' },
+      { cellsWide: 5, cellsHigh: 3, layout: 'double', depth: 0, roof: 'gable' },
       camera,
     );
     expect(parseSketchXml(xml).roof).toBe('gable');
     expect(xml).toContain('<sketch:roof type="gable"/>');
 
-    expect(() => parseSketchXml(xml.replace('serviceGap="0"', 'serviceGap="1"'))).toThrow(
+    expect(() => parseSketchXml(xml.replace('depth="0"', 'depth="1"'))).toThrow(
       'not valid for this layout',
     );
   });
@@ -101,7 +102,7 @@ describe('Sketch XML', () => {
       'Cells wide',
     );
     expect(() =>
-      parseSketchXml(xml.replace('formatVersion="0.1.0"', 'formatVersion="2.0.0"')),
+      parseSketchXml(xml.replace('formatVersion="1.0.0"', 'formatVersion="2.0.0"')),
     ).toThrow('format version');
   });
 });

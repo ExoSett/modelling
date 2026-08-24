@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <exosettModel xmlns="https://www.exosett.com/xml/model"
               xmlns:sketch="https://www.exosett.com/xml/app/sketch"
-              formatVersion="0.1.0">
+              formatVersion="1.0.0">
   <metadata>
     <title>Three abstract accommodation modules</title>
     <author>Example model author</author>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <exosettModel xmlns="https://www.exosett.com/xml/model"
-              formatVersion="0.1.0">
+              formatVersion="1.0.0">
   <metadata>
     <title>Minimal frame pair</title>
   </metadata>
@@ -17,4 +17,3 @@
     </framePair>
   </framePairs>
 </exosettModel>
-

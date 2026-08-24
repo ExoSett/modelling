@@ -85,7 +85,11 @@ function buildFrame(
   return frame;
 }
 
-export function buildFramePair(model: SketchModel, includeService = true): THREE.Group {
+export function buildFramePair(
+  model: SketchModel,
+  includeService = true,
+  cellsWide = model.cellsWide,
+): THREE.Group {
   const pair = new THREE.Group();
   pair.name = 'frame-pair';
 
@@ -94,7 +98,7 @@ export function buildFramePair(model: SketchModel, includeService = true): THREE
   const serviceStart = accommodation.depth + DIMENSIONS_METRES.interFrameGap;
 
   const accommodationFrame = buildFrame(
-    model.cellsWide,
+    cellsWide,
     model.cellsHigh,
     accommodation.width,
     accommodation.depth,
@@ -106,7 +110,7 @@ export function buildFramePair(model: SketchModel, includeService = true): THREE
   accommodationFrame.name = 'accommodation-frame';
 
   const serviceFrame = buildFrame(
-    model.cellsWide,
+    cellsWide,
     model.cellsHigh,
     service.width,
     service.depth,
@@ -119,9 +123,9 @@ export function buildFramePair(model: SketchModel, includeService = true): THREE
 
   pair.add(accommodationFrame);
   if (includeService) pair.add(serviceFrame);
-  const facades = buildFacades(model);
+  const facades = buildFacades({ ...model, cellsWide });
   if (facades) pair.add(facades);
-  pair.position.x = -(model.cellsWide * accommodation.width) / 2;
+  pair.position.x = -(cellsWide * accommodation.width) / 2;
   pair.position.y = -(accommodation.depth + DIMENSIONS_METRES.interFrameGap + service.depth) / 2;
   return pair;
 }

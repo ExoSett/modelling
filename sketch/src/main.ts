@@ -1,6 +1,5 @@
 import './styles.css';
 import {
-  DEFAULT_MODEL,
   DIMENSIONS_METRES,
   BUILDING_LAYOUTS,
   FACADE_STYLES,
@@ -14,6 +13,7 @@ import {
   type SketchModel,
 } from './model/model';
 import { createSketchXml, parseSketchXml } from './model/xml';
+import { modelFromUrl, urlForModel } from './model/url';
 import { SketchRenderer } from './scene/renderer';
 
 function element<T extends HTMLElement>(id: string): T {
@@ -26,8 +26,10 @@ const canvas = element<HTMLCanvasElement>('viewport');
 const widthInput = element<HTMLInputElement>('cells-wide');
 const heightInput = element<HTMLInputElement>('cells-high');
 const layoutSelect = element<HTMLSelectElement>('building-layout');
-const serviceGapInput = element<HTMLInputElement>('service-gap');
-const serviceGapControl = element<HTMLElement>('service-gap-control');
+const depthInput = element<HTMLInputElement>('depth');
+const depthControl = element<HTMLElement>('depth-control');
+const depthRange = element<HTMLElement>('depth-range');
+const depthHelp = element<HTMLElement>('depth-help');
 const roofSelect = element<HTMLSelectElement>('roof-type');
 const roofHelp = element<HTMLElement>('roof-help');
 const facadeSelect = element<HTMLSelectElement>('facade-style');
@@ -36,7 +38,7 @@ const status = element<HTMLOutputElement>('status');
 const modelSize = element<HTMLElement>('model-size');
 const webglError = element<HTMLElement>('webgl-error');
 
-let model: SketchModel = { ...DEFAULT_MODEL };
+let model: SketchModel = modelFromUrl(new URL(window.location.href));
 let renderer: SketchRenderer | undefined;
 
 function announce(message: string, error = false): void {
@@ -67,24 +69,47 @@ function updateRoofControl(): void {
     : 'Choose corrugated metal or a terracotta-tiled gable.';
 }
 
+function updateDepthControl(layout = model.layout ?? 'single'): void {
+  depthControl.hidden = layout === 'single';
+  const minimum = layout === 'quadrangle' ? LIMITS.minQuadrangleDepth : LIMITS.minDoubleDepth;
+  const maximum = layout === 'quadrangle' ? LIMITS.maxWide : LIMITS.maxDoubleDepth;
+  depthInput.min = String(minimum);
+  depthInput.max = String(maximum);
+  depthRange.textContent = `${minimum}–${maximum}`;
+  depthHelp.textContent =
+    layout === 'quadrangle'
+      ? 'Sets the width of each side frame pair in cells.'
+      : 'At zero, the two accommodation frames share one service frame.';
+}
+
+function writeInputs(): void {
+  widthInput.value = String(model.cellsWide);
+  heightInput.value = String(model.cellsHigh);
+  layoutSelect.value = model.layout ?? 'single';
+  depthInput.value = String(model.depth ?? 0);
+  facadeSelect.value = model.facade?.styleId ?? '';
+  updateDepthControl();
+  updateRoofControl();
+}
+
 function readInputs(): SketchModel | undefined {
   if (
     !widthInput.checkValidity() ||
     !heightInput.checkValidity() ||
-    !serviceGapInput.checkValidity() ||
+    !depthInput.checkValidity() ||
     !isBuildingLayout(layoutSelect.value)
   )
     return undefined;
   const cellsWide = widthInput.valueAsNumber;
   const cellsHigh = heightInput.valueAsNumber;
   if (!Number.isInteger(cellsWide) || !Number.isInteger(cellsHigh)) return undefined;
-  const serviceGap = serviceGapInput.valueAsNumber;
-  if (!Number.isInteger(serviceGap)) return undefined;
+  const depth = depthInput.valueAsNumber;
+  if (!Number.isInteger(depth)) return undefined;
   return {
     cellsWide,
     cellsHigh,
     layout: layoutSelect.value,
-    serviceGap,
+    depth,
     facade: model.facade,
     roof: isRoofType(roofSelect.value) ? roofSelect.value : model.roof,
   };
@@ -104,21 +129,17 @@ for (const style of FACADE_STYLES) {
   facadeSelect.append(option);
 }
 
-function rebuildFromInputs(clearFacade = false): void {
+function rebuildFromInputs(): void {
   const next = readInputs();
   if (!next || !renderer) return;
   model = next;
   model.roof = normalizedRoofType(model);
-  serviceGapControl.hidden = model.layout !== 'double';
+  updateDepthControl();
   updateRoofControl();
-  if (clearFacade) {
-    model.facade = undefined;
-    facadeSelect.value = '';
-  }
   renderer.setModel(model);
   updateFacts();
   announce(
-    `${BUILDING_LAYOUTS.find((layout) => layout.id === model.layout)?.label}: ${model.cellsWide} wide × ${model.cellsHigh} high`,
+    `${BUILDING_LAYOUTS.find((layout) => layout.id === model.layout)?.label}: ${model.cellsHigh} high × ${model.cellsWide} wide${model.layout === 'single' ? '' : ` × ${model.depth} deep`}`,
   );
 }
 
@@ -131,10 +152,14 @@ function download(content: string, type: string, filename: string): void {
   URL.revokeObjectURL(url);
 }
 
-for (const input of [widthInput, heightInput])
-  input.addEventListener('input', () => rebuildFromInputs(true));
-serviceGapInput.addEventListener('input', () => rebuildFromInputs());
-layoutSelect.addEventListener('change', () => rebuildFromInputs());
+for (const input of [widthInput, heightInput]) input.addEventListener('input', rebuildFromInputs);
+depthInput.addEventListener('input', () => rebuildFromInputs());
+layoutSelect.addEventListener('change', () => {
+  if (!isBuildingLayout(layoutSelect.value)) return;
+  updateDepthControl(layoutSelect.value);
+  depthInput.value = layoutSelect.value === 'quadrangle' ? '1' : '0';
+  rebuildFromInputs();
+});
 
 roofSelect.addEventListener('change', () => {
   if (!renderer || !isRoofType(roofSelect.value)) return;
@@ -175,6 +200,15 @@ element<HTMLButtonElement>('save-png').addEventListener('click', () => {
   announce('PNG downloaded');
 });
 
+element<HTMLButtonElement>('copy-link').addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(urlForModel(new URL(window.location.href), model).href);
+    announce('Link copied');
+  } catch {
+    announce('The link could not be copied.', true);
+  }
+});
+
 element<HTMLButtonElement>('load-xml').addEventListener('click', () => fileInput.click());
 
 fileInput.addEventListener('change', async () => {
@@ -183,13 +217,7 @@ fileInput.addEventListener('change', async () => {
   try {
     const loaded = parseSketchXml(await file.text());
     model = loaded;
-    widthInput.value = String(model.cellsWide);
-    heightInput.value = String(model.cellsHigh);
-    layoutSelect.value = model.layout ?? 'single';
-    serviceGapInput.value = String(model.serviceGap);
-    serviceGapControl.hidden = model.layout !== 'double';
-    updateRoofControl();
-    facadeSelect.value = model.facade?.styleId ?? '';
+    writeInputs();
     renderer.setModel(model, model.camera);
     updateFacts();
     announce(`Loaded ${file.name}`);
@@ -203,11 +231,11 @@ fileInput.addEventListener('change', async () => {
 try {
   renderer = new SketchRenderer(canvas);
   renderer.setModel(model);
-  layoutSelect.value = model.layout ?? 'single';
-  serviceGapInput.value = String(model.serviceGap);
-  updateRoofControl();
+  writeInputs();
   updateFacts();
-  announce(`One pair: ${DEFAULT_MODEL.cellsWide} wide × ${DEFAULT_MODEL.cellsHigh} high`);
+  announce(
+    `${BUILDING_LAYOUTS.find((layout) => layout.id === model.layout)?.label}: ${model.cellsHigh} high × ${model.cellsWide} wide${model.layout === 'single' ? '' : ` × ${model.depth} deep`}`,
+  );
 } catch (error) {
   console.error(error);
   webglError.hidden = false;

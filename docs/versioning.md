@@ -1,6 +1,6 @@
 # Format versioning
 
-ExoSett model documents carry an explicit three-part version number: `major.minor.patch`. The initial version is `0.1.0`; `0.x` indicates that the format is still being designed.
+ExoSett model documents carry an explicit three-part version number: `major.minor.patch`. The initial version was `0.1.0`. The first breaking revision is `1.0.0`; version 1 has no special status beyond being the next major version.
 
 - **Major** denotes a breaking change. A document using the new major version cannot automatically be assumed to retain the same meaning in the previous major version. Migration may require an explicit transformation or human judgement (`1.4.2` to `2.0.0`).
 - **Minor** denotes a significant evolution in interpretation or expressive capability within a major-version family. Software must not blindly assume all minor versions are semantically identical (`1.2.0` to `1.3.0`).
@@ -10,4 +10,4 @@ Versions describe the semantics of the specification, not merely changes to the 
 
 Consumers should reject unsupported major versions. They should make an explicit compatibility decision for an unfamiliar minor version rather than silently treating it as equivalent. Patch versions within a supported major/minor family are intended to preserve meaning, though consumers may still report that the exact patch is unfamiliar.
 
-The exact version appears both in a schema filename such as `exosett-model-0.1.0.xsd` and in a document's `formatVersion` attribute. The modelling namespace is stable across minor and patch releases. Namespace strategy for a future major version will be decided when that version is designed.
+The exact version appears both in a schema filename such as `exosett-model-1.0.0.xsd` and in a document's `formatVersion` attribute. The modelling namespace remains stable across the 1.0.0 major-version change; consumers use `formatVersion` to distinguish incompatible formats.

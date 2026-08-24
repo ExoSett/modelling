@@ -8,17 +8,17 @@ This role is distinct from the sibling `ExoSett/website` repository: the website
 
 - [`docs/format.md`](docs/format.md) — scope and design of the XML format
 - [`docs/versioning.md`](docs/versioning.md) — format version policy
-- [`schema/exosett-model-0.1.0.xsd`](schema/exosett-model-0.1.0.xsd) — initial XML Schema
+- [`schema/exosett-model-1.0.0.xsd`](schema/exosett-model-1.0.0.xsd) — current XML Schema
 - [`examples/`](examples/) — small, validating model documents
 - [`sketch/README.md`](sketch/README.md) — lightweight static ExoSett Sketch application
 
-The initial `0.1.0` schema is deliberately limited. It can describe multiple placed frame pairs, abstract module types, and module placements. It is not an engineering specification and does not certify structural soundness, manufacturability, regulatory compliance, or fitness for any purpose.
+The `1.0.0` schema is deliberately limited. It can describe multiple placed frame pairs, abstract module types, and module placements. It is not an engineering specification and does not certify structural soundness, manufacturability, regulatory compliance, or fitness for any purpose.
 
 To validate the examples on a system with `xmllint` (included with macOS and commonly available on Unix-like systems):
 
 ```sh
 for file in examples/*.xml; do
-  xmllint --noout --schema schema/exosett-model-0.1.0.xsd "$file"
+  xmllint --noout --schema schema/exosett-model-1.0.0.xsd "$file"
 done
 ```
 

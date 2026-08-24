@@ -72,24 +72,22 @@ function facadeFromXml(document: Document): SketchModel['facade'] {
   return { styleId };
 }
 
-function layoutFromXml(document: Document): Pick<SketchModel, 'layout' | 'serviceGap'> {
+function layoutFromXml(document: Document): Pick<SketchModel, 'layout' | 'depth'> {
   const layout = document.getElementsByTagNameNS(SKETCH_NAMESPACE, 'layout')[0];
-  if (!layout) return { layout: 'single', serviceGap: 0 };
+  if (!layout) return { layout: 'single', depth: 0 };
   const type = layout.getAttribute('type');
   if (!type || !isBuildingLayout(type))
     throw new Error('The Sketch building layout is unsupported.');
-  const serviceGap = validateCellCount(
-    requiredNumber(layout, 'serviceGap'),
-    LIMITS.minServiceGap,
-    LIMITS.maxServiceGap,
-    'Service-frame gap',
-  );
-  return { layout: type, serviceGap };
+  const minimum = type === 'quadrangle' ? LIMITS.minQuadrangleDepth : LIMITS.minDoubleDepth;
+  const maximum =
+    type === 'single' ? 0 : type === 'quadrangle' ? LIMITS.maxWide : LIMITS.maxDoubleDepth;
+  const depth = validateCellCount(requiredNumber(layout, 'depth'), minimum, maximum, 'Depth');
+  return { layout: type, depth };
 }
 
 function roofFromXml(
   document: Document,
-  model: Pick<SketchModel, 'layout' | 'serviceGap'>,
+  model: Pick<SketchModel, 'layout' | 'depth'>,
 ): SketchModel['roof'] {
   const roof = document.getElementsByTagNameNS(SKETCH_NAMESPACE, 'roof')[0];
   if (!roof) return normalizedRoofType(model);
@@ -135,14 +133,16 @@ export function parseSketchXml(xml: string): SketchModel {
     LIMITS.maxHigh,
     'Cells high',
   );
-  for (const framePair of Array.from(framePairs).slice(1)) {
+  for (const [index, framePair] of Array.from(framePairs).entries()) {
     const pairGrid = requiredElement(framePair, MODEL_NAMESPACE, 'grid');
+    const expectedWidth =
+      layout.layout === 'quadrangle' && index % 2 === 1 ? layout.depth : cellsWide;
     if (
-      requiredNumber(pairGrid, 'widthCells') !== cellsWide ||
+      requiredNumber(pairGrid, 'widthCells') !== expectedWidth ||
       requiredNumber(pairGrid, 'heightCells') !== cellsHigh ||
       requiredNumber(pairGrid, 'depthCells') !== 1
     ) {
-      throw new Error('All Sketch frame pairs must use the same grid dimensions.');
+      throw new Error('The Sketch frame-pair grid dimensions do not match the layout.');
     }
   }
 
@@ -188,8 +188,8 @@ function formatXml(xml: string): string {
 
 function documentForModel(model: SketchModel, camera: CameraState): XMLDocument {
   const layoutType = model.layout ?? 'single';
-  const serviceGap = model.serviceGap ?? 0;
-  const normalizedModel = { ...model, layout: layoutType, serviceGap };
+  const depth = model.depth ?? (layoutType === 'quadrangle' ? 1 : 0);
+  const normalizedModel = { ...model, layout: layoutType, depth };
   const roofType = normalizedRoofType(normalizedModel);
   const document = documentImplementation();
   const root = document.documentElement;
@@ -204,8 +204,7 @@ function documentForModel(model: SketchModel, camera: CameraState): XMLDocument 
   root.append(metadata);
 
   const framePairs = document.createElementNS(MODEL_NAMESPACE, 'framePairs');
-  const width = model.cellsWide * DIMENSIONS_METRES.accommodationCell.width;
-  const depth =
+  const pairPhysicalDepth =
     DIMENSIONS_METRES.accommodationCell.depth +
     DIMENSIONS_METRES.interFrameGap +
     DIMENSIONS_METRES.serviceCell.depth;
@@ -214,8 +213,8 @@ function documentForModel(model: SketchModel, camera: CameraState): XMLDocument 
     framePair.setAttribute('id', `frame-pair-${index + 1}`);
     const placement = document.createElementNS(MODEL_NAMESPACE, 'placement');
     const angle = (pairPlacement.rotation * Math.PI) / 180;
-    const localX = -width / 2;
-    const localY = -depth / 2;
+    const localX = -(pairPlacement.cellsWide * DIMENSIONS_METRES.accommodationCell.width) / 2;
+    const localY = -pairPhysicalDepth / 2;
     const x = pairPlacement.x + localX * Math.cos(angle) - localY * Math.sin(angle);
     const y = pairPlacement.y + localX * Math.sin(angle) + localY * Math.cos(angle);
     for (const [name, value] of Object.entries({ x, y, z: 0, rotation: pairPlacement.rotation })) {
@@ -223,7 +222,7 @@ function documentForModel(model: SketchModel, camera: CameraState): XMLDocument 
     }
     placement.setAttribute('unit', 'm');
     const grid = document.createElementNS(MODEL_NAMESPACE, 'grid');
-    grid.setAttribute('widthCells', String(model.cellsWide));
+    grid.setAttribute('widthCells', String(pairPlacement.cellsWide));
     grid.setAttribute('heightCells', String(model.cellsHigh));
     grid.setAttribute('depthCells', '1');
     const accommodation = document.createElementNS(MODEL_NAMESPACE, 'accommodationFrame');
@@ -255,7 +254,7 @@ function documentForModel(model: SketchModel, camera: CameraState): XMLDocument 
 
   const applications = document.createElementNS(MODEL_NAMESPACE, 'applications');
   const sketchState = document.createElementNS(SKETCH_NAMESPACE, 'sketch:state');
-  sketchState.setAttribute('version', '0.1.0');
+  sketchState.setAttribute('version', FORMAT_VERSION);
   const cameraElement = document.createElementNS(SKETCH_NAMESPACE, 'sketch:camera');
   const attributes = {
     positionX: camera.position.x,
@@ -271,7 +270,7 @@ function documentForModel(model: SketchModel, camera: CameraState): XMLDocument 
   sketchState.append(cameraElement);
   const layout = document.createElementNS(SKETCH_NAMESPACE, 'sketch:layout');
   layout.setAttribute('type', layoutType);
-  layout.setAttribute('serviceGap', String(serviceGap));
+  layout.setAttribute('depth', String(depth));
   sketchState.append(layout);
   const roof = document.createElementNS(SKETCH_NAMESPACE, 'sketch:roof');
   roof.setAttribute('type', roofType);
