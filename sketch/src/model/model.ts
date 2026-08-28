@@ -69,7 +69,7 @@ export function isRoofType(value: string): value is RoofType {
 export function allowedRoofTypes(model: Pick<SketchModel, 'layout' | 'depth'>): RoofType[] {
   return model.layout === 'quadrangle' || (model.layout === 'double' && (model.depth ?? 0) > 0)
     ? ['none', 'space-frame']
-    : ['none', 'flat', 'gable'];
+    : ['none', 'flat', 'gable', 'space-frame'];
 }
 
 export function normalizedRoofType(

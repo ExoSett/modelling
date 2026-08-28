@@ -39,8 +39,18 @@ describe('model validation', () => {
   });
 
   it('offers roof types appropriate to the layout', () => {
-    expect(allowedRoofTypes({ layout: 'single', depth: 0 })).toEqual(['none', 'flat', 'gable']);
-    expect(allowedRoofTypes({ layout: 'double', depth: 0 })).toEqual(['none', 'flat', 'gable']);
+    expect(allowedRoofTypes({ layout: 'single', depth: 0 })).toEqual([
+      'none',
+      'flat',
+      'gable',
+      'space-frame',
+    ]);
+    expect(allowedRoofTypes({ layout: 'double', depth: 0 })).toEqual([
+      'none',
+      'flat',
+      'gable',
+      'space-frame',
+    ]);
     expect(allowedRoofTypes({ layout: 'double', depth: 1 })).toEqual(['none', 'space-frame']);
     expect(allowedRoofTypes({ layout: 'quadrangle', depth: 1 })).toEqual(['none', 'space-frame']);
     expect(normalizedRoofType({ layout: 'double', depth: 1, roof: 'gable' })).toBe('none');

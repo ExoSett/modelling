@@ -132,6 +132,6 @@ export function buildFramePair(
 
 export function disposeFramePair(group: THREE.Group): void {
   group.traverse((object) => {
-    if (object instanceof THREE.Mesh) object.geometry.dispose();
+    if (object instanceof THREE.Mesh || object instanceof THREE.Line) object.geometry.dispose();
   });
 }

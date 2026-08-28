@@ -28,6 +28,11 @@ const windowMaterial = new THREE.MeshStandardMaterial({
 });
 const darkMaterial = new THREE.MeshStandardMaterial({ color: 0x151717, roughness: 0.6 });
 const balconyMaterial = new THREE.MeshStandardMaterial({ color: 0x363b39, roughness: 0.65 });
+const panelEdgeMaterial = new THREE.LineBasicMaterial({
+  color: 0x252827,
+  transparent: true,
+  opacity: 0.48,
+});
 
 function box(
   group: THREE.Group,
@@ -129,6 +134,19 @@ function buildCellFacade(styleId: FacadeStyleId): THREE.Group {
     [cell.width / 2, FRONT_Y, cell.height / 2],
     surfaces[style.surface],
   );
+
+  const frontFaceY = FRONT_Y - PANEL_DEPTH / 2 - 0.006;
+  const perimeter = new THREE.LineLoop(
+    new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, frontFaceY, 0),
+      new THREE.Vector3(cell.width, frontFaceY, 0),
+      new THREE.Vector3(cell.width, frontFaceY, cell.height),
+      new THREE.Vector3(0, frontFaceY, cell.height),
+    ]),
+    panelEdgeMaterial,
+  );
+  perimeter.name = 'facade-panel-perimeter';
+  facade.add(perimeter);
 
   if (style.surface === 'timber') addTimberJoints(facade, cell.width, cell.height);
   if (style.form === 'window') addWindow(facade, cell.width, cell.height, false);

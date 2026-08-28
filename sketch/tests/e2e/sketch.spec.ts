@@ -109,7 +109,12 @@ test('switches between facing-pair and quadrangle layouts', async ({ page }) => 
 
   await layout.selectOption('double');
   await expect(depthControl).toBeVisible();
-  await expect(page.locator('#roof-type option')).toHaveText(['None', 'Flat', 'Gable']);
+  await expect(page.locator('#roof-type option')).toHaveText([
+    'None',
+    'Flat',
+    'Gable',
+    'Space frame',
+  ]);
   await expect(page.locator('#facade-style')).toHaveValue('timber-balcony');
   await page.locator('#depth').fill('5');
   await expect(page.locator('#roof-type option')).toHaveText(['None', 'Space frame']);
@@ -176,4 +181,16 @@ test('selects and saves a gable roof', async ({ page }) => {
   let xml = '';
   for await (const chunk of stream) xml += chunk.toString();
   expect(xml).toContain('<sketch:roof type="gable"/>');
+});
+
+test('offers a space frame roof for a single frame pair', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#roof-type option')).toHaveText([
+    'None',
+    'Flat',
+    'Gable',
+    'Space frame',
+  ]);
+  await page.locator('#roof-type').selectOption('space-frame');
+  await expect(page.locator('#status')).toHaveText('Space frame roof selected');
 });

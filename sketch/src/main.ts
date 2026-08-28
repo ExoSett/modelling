@@ -136,7 +136,7 @@ function rebuildFromInputs(): void {
   model.roof = normalizedRoofType(model);
   updateDepthControl();
   updateRoofControl();
-  renderer.setModel(model);
+  renderer.setModel(model, renderer.cameraState());
   updateFacts();
   announce(
     `${BUILDING_LAYOUTS.find((layout) => layout.id === model.layout)?.label}: ${model.cellsHigh} high × ${model.cellsWide} wide${model.layout === 'single' ? '' : ` × ${model.depth} deep`}`,
