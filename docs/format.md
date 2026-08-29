@@ -1,24 +1,24 @@
-# ExoSett model XML format
+# ExoSett building specification XML format
 
 ## Purpose and scope
 
-The format is a common, application-independent language for describing ExoSett buildings. ExoSett Sketch is expected to be its first producer and consumer, but Sketch does not own the format.
+The ExoSett XML Schema defines the machine-readable format used by an ExoSett building specification. The specification is the project record of the building model, independent of any particular application. ExoSett Sketch is its first producer and consumer, but Sketch neither owns the format nor provides the only way to create an initial specification.
 
-Version 1.0.0 establishes only a small vocabulary: metadata, one or more frame pairs, abstract accommodation-module types, and placements of those modules in accommodation-frame cells. It records enough physical dimensions and relative placement for an abstract renderer. It does not describe frame nodes, loads, materials, connections, services, circulation, manufacture, assembly, or operation.
+Schema version 1.0.0 provides a small vocabulary: metadata, one or more frame pairs, abstract accommodation-module types, and placements of those modules in accommodation-frame cells. It records enough physical dimensions and relative placement for an abstract renderer. It does not yet describe frame nodes, loads, materials, connections, services, circulation, manufacture, assembly, or operation.
 
-Future additions should be driven by real modelling use cases. The format may eventually support substantially richer work, but this version deliberately avoids guessing at a future engineering data model.
+The schema is expected to evolve through many versions. Development should be driven by practical use and feedback from designers, engineers, constructors, Site Office staff, and others working with building specifications. New subject areas may first be represented simply, including through free-text notes where the applicable schema permits them, and become more formally structured as experience establishes what is needed. The current schema is neither complete nor final, but additions should avoid guessing at a future engineering data model.
 
 ## No universal engineering specification
 
 ExoSett is a broad concept, not a single authoritative engineering system. Organisations may define their own frame systems, frame nodes, module interfaces, dimensions, materials, manufacturing methods, and engineering practices.
 
-A model can optionally identify a design authority, family, specification, and revision. These values are descriptive references supplied by the model author; they do not imply endorsement or conformance to a central ExoSett specification. A basic model need not provide them.
+A building specification can optionally identify a design authority, family, specification, and revision. These values are descriptive references supplied by its author; they do not imply endorsement or conformance to a central ExoSett engineering specification. A basic building specification need not provide them.
 
 Validation against the XSD checks document structure only. It does not establish that a design is structurally sound, manufacturable, safe, legally compliant, or otherwise valid.
 
 ## Document structure
 
-The root element is `exosettModel` in the stable namespace `https://www.exosett.com/xml/model`. Its required `formatVersion` attribute records the semantic specification version and is `1.0.0` for this schema.
+The root element is `exosettModel` in the stable namespace `https://www.exosett.com/xml/model`. Its required `formatVersion` attribute records the semantic version of the ExoSett schema to which the document conforms and is `1.0.0` for this schema.
 
 Core children appear in this order:
 
@@ -65,12 +65,12 @@ No ISO container type or fixed envelope is assumed. Dimensions resembling an ISO
 
 ## Core data and application data
 
-Core model data states what the author says the building is. Camera position, zoom, rendering choices, selection, and similar UI state describe how an application presents or works with that model and do not belong in the core.
+Core building specification data states what the author says the building is. Camera position, zoom, rendering choices, selection, and similar UI state describe how an application presents or works with that model and do not belong in the core.
 
 The optional `applications` element accepts elements from namespaces other than the core model namespace. Each application should use a namespace it controls and schema-aware processors may validate an extension when its schema is available. Other applications can ignore extensions they do not understand without treating their content as core model data. Free-form, unnamespaced content is intentionally rejected.
 
 ## Evolution
 
-The schema filename `exosett-model-1.0.0.xsd` identifies the exact semantic version. Documents retain the stable modelling namespace and carry their complete version in `formatVersion`. Consumers use that version to distinguish incompatible formats.
+The schema filename `exosett-model-1.0.0.xsd` identifies the exact semantic version. Documents retain the stable modelling namespace and declare the schema version to which they conform in `formatVersion`. A later version of the same building specification may deliberately retain that schema version or adopt another one; schema changes are not automatic upgrades.
 
-See [versioning.md](versioning.md) for the version policy.
+See [versioning.md](versioning.md) for the schema and building specification versioning policy.

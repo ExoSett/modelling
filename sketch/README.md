@@ -1,6 +1,6 @@
 # ExoSett Sketch
 
-ExoSett Sketch is a lightweight, static browser application for creating and exploring simple abstract ExoSett buildings assembled from frame pairs. It is the first producer and consumer of the common ExoSett XML format, not the owner of that format.
+ExoSett Sketch is a lightweight, static browser application for creating and exploring simple abstract ExoSett buildings assembled from frame pairs. It is the first producer and consumer of the common ExoSett building specification XML format, not the owner of that format or the only way to create an initial specification.
 
 The application asks for the number of accommodation-frame cells high (1–10) and wide (1–20). It can arrange one pair, two pairs separated by a depth of 0–5 cell widths, or four pairs whose side pairs are 1–20 cells wide. A zero-depth two-pair layout uses one shared service frame. Sketch supports mouse and touch inspection, can save or reload XML, download the current view as a PNG, and copy a canonical link to the current model. A single optional front-facade style can be applied to every accommodation-frame cell for quick visual studies.
 
