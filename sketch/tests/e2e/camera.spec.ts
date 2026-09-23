@@ -30,8 +30,11 @@ function bounds(model: SketchModel) {
 }
 
 test('dimension changes fit the building and retain a rotated, panned view', async ({ page }) => {
+  await page.clock.install({ time: new Date('2026-01-01T00:00:00Z') });
   await page.goto('/');
   await page.locator('#building-layout').selectOption('double');
+  // Control animation frames so software rendering speed cannot affect the baseline.
+  await page.clock.pauseAt(new Date('2026-01-01T00:01:00Z'));
   const viewport = page.locator('#viewport');
   await viewport.scrollIntoViewIfNeeded();
   const rect = await viewport.boundingBox();
@@ -46,15 +49,8 @@ test('dimension changes fit the building and retain a rotated, panned view', asy
   await page.mouse.down({ button: 'right' });
   await page.mouse.move(x + 20, y + 10, { steps: 8 });
   await page.mouse.up({ button: 'right' });
-  // Wait for actual damping convergence, independent of browser rendering speed.
-  let initial = await cameraState(page);
-  await expect(async () => {
-    const next = await cameraState(page);
-    const movement =
-      next.position.distanceTo(initial.position) + next.target.distanceTo(initial.target);
-    initial = next;
-    expect(movement).toBeLessThan(0.000001);
-  }).toPass({ timeout: 20000, intervals: [500] });
+  // Retain pending inertia: resizing must discard it without changing this direction.
+  const initial = await cameraState(page);
   const defaultDirection = new THREE.Vector3(1, -1.25, 0.85).normalize();
   expect(initial.direction.distanceTo(defaultDirection)).toBeGreaterThan(0.1);
   let model: SketchModel = { cellsWide: 5, cellsHigh: 3, layout: 'double', depth: 0 };
@@ -73,6 +69,7 @@ test('dimension changes fit the building and retain a rotated, panned view', asy
   ];
   for (const change of changes) {
     await page.locator(change.input).fill(String(change.value));
+    await page.clock.runFor(32);
     model = { ...model, ...change.model };
     const state = await cameraState(page);
     expect(state.direction.distanceTo(initial.direction)).toBeLessThan(0.0001);
@@ -100,6 +97,7 @@ test('dimension changes fit the building and retain a rotated, panned view', asy
   expect(distances[4]!).toBeGreaterThan(distances[0]!);
   expect(distances[7]!).toBeLessThan(distances[4]! / 2);
   await page.locator('#reset-view').click();
+  await page.clock.runFor(32);
   const reset = await cameraState(page);
   expect(reset.direction.distanceTo(defaultDirection)).toBeLessThan(0.0001);
   expect(reset.target.distanceTo(bounds(model).getCenter(new THREE.Vector3()))).toBeLessThan(
