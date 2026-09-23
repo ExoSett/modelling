@@ -6,13 +6,13 @@ const FRAME_PROFILE = 0.12;
 const NODE_SIZE = 0.19;
 
 const accommodationMaterial = new THREE.MeshStandardMaterial({
-  color: 0x202323,
+  color: 0x3f6f8f,
   roughness: 0.55,
   metalness: 0.18,
 });
 
 const serviceMaterial = new THREE.MeshStandardMaterial({
-  color: 0x7b8584,
+  color: 0xb86b4b,
   roughness: 0.62,
   metalness: 0.12,
 });

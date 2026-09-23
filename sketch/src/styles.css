@@ -385,8 +385,8 @@ button.primary:hover {
 
 .viewport-key {
   position: absolute;
-  right: 16px;
-  bottom: 16px;
+  top: 16px;
+  left: 16px;
   display: flex;
   gap: 14px;
   padding: 9px 12px;
@@ -408,11 +408,11 @@ button.primary:hover {
 }
 
 .swatch.accommodation {
-  background: #202323;
+  background: #3f6f8f;
 }
 
 .swatch.service {
-  background: #7b8584;
+  background: #b86b4b;
 }
 
 .webgl-error {
@@ -513,10 +513,8 @@ button.primary:hover {
   }
 
   .viewport-key {
-    right: 10px;
-    bottom: 10px;
+    top: 10px;
     left: 10px;
-    justify-content: center;
   }
 
   .site-footer__inner {
