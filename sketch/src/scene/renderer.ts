@@ -57,7 +57,10 @@ export class SketchRenderer {
     this.resize();
   }
 
-  setModel(model: SketchModel, cameraState?: CameraState): void {
+  setModel(model: SketchModel, cameraState?: CameraState, reframe = false): void {
+    const previousCenter = this.building
+      ? new THREE.Box3().setFromObject(this.building).getCenter(new THREE.Vector3())
+      : undefined;
     if (this.building) {
       this.scene.remove(this.building);
       disposeBuilding(this.building);
@@ -66,7 +69,11 @@ export class SketchRenderer {
     this.scene.add(this.building);
     this.fitShadowCamera();
 
-    if (cameraState) this.setCameraState(cameraState);
+    if (reframe && previousCenter) {
+      const direction = this.camera.position.clone().sub(this.controls.target).normalize();
+      const panOffset = this.controls.target.clone().sub(previousCenter);
+      this.fitView(direction, panOffset);
+    } else if (cameraState) this.setCameraState(cameraState);
     else this.resetView();
   }
 
@@ -92,22 +99,31 @@ export class SketchRenderer {
   }
 
   resetView(): void {
+    this.fitView(new THREE.Vector3(1, -1.25, 0.85).normalize());
+  }
+
+  private fitView(viewDirection: THREE.Vector3, panOffset = new THREE.Vector3()): void {
     if (!this.building) return;
+    // Discard pending orbit/pan inertia before applying the retained view.
+    const damping = this.controls.enableDamping;
+    this.controls.enableDamping = false;
+    this.controls.update();
+    this.controls.enableDamping = damping;
     const box = new THREE.Box3().setFromObject(this.building);
     const sphere = box.getBoundingSphere(new THREE.Sphere());
-    const radius = Math.max(sphere.radius, 3);
+    // Enclose the building around the retained orbit target, including a user's pan.
+    const radius = Math.max(sphere.radius + panOffset.length(), 3);
     const verticalFov = THREE.MathUtils.degToRad(this.camera.fov);
     const horizontalFov = 2 * Math.atan(Math.tan(verticalFov / 2) * this.camera.aspect);
     const fittingFov = Math.min(verticalFov, horizontalFov);
     const distance = (radius / Math.sin(fittingFov / 2)) * 1.08;
-    const viewDirection = new THREE.Vector3(1, -1.25, 0.85).normalize();
-    this.controls.target.copy(sphere.center);
-    this.camera.position.copy(sphere.center).addScaledVector(viewDirection, distance);
+    this.controls.target.copy(sphere.center).add(panOffset);
+    this.camera.position.copy(this.controls.target).addScaledVector(viewDirection, distance);
     this.camera.near = Math.max(radius / 100, 0.05);
     this.camera.far = radius * 25;
     this.camera.updateProjectionMatrix();
     this.controls.minDistance = radius * 0.25;
-    this.controls.maxDistance = radius * 8;
+    this.controls.maxDistance = Math.max(radius * 8, distance * 1.1);
     this.controls.update();
     this.requestRender();
   }
