@@ -26,6 +26,10 @@ npm run test:e2e
 
 `npm run build:embed` writes fixed-name `sketch.js` and `sketch.css` assets to `dist-embed/`. The ExoSett website deployment places those assets in `/design/sketch/assets/`; the website repository owns the surrounding page, navigation, metadata, and footer.
 
+The containing page wraps its header and Sketch main area in `.sketch-shell`, which fills the dynamic viewport. Controls scroll independently beside the model on desktop and below it on narrow screens; short landscape screens use side-by-side panes. Usage explanations and the site footer follow the shell. Keep this structure in sync between `index.html` and the website's `/design/sketch/index.html` when changing the embedded layout.
+
+The canvas fills its container without contributing an intrinsic layout size. Its existing `ResizeObserver` updates the render size and camera projection; resizing redraws without advancing orbit damping or reframing the model. Browser tests cover viewport fitting, independent control scrolling, camera preservation through resizing, and phone touch orbit/zoom.
+
 ## Technology
 
 - TypeScript without a UI framework

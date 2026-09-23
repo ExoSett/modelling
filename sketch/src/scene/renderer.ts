@@ -161,7 +161,9 @@ export class SketchRenderer {
     this.renderer.setSize(width, height, false);
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
-    this.requestRender();
+    // Resizing must not advance residual orbit damping on an otherwise idle view.
+    // Active gestures continue through their existing animation-frame requests.
+    this.render();
   }
 
   private requestRender(): void {

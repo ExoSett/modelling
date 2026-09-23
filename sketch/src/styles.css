@@ -31,6 +31,16 @@ body {
   margin: 0;
 }
 
+/* The working area fits the screen; explanatory page content follows below it. */
+.sketch-shell {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100vh;
+  height: 100dvh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
+}
+
 a {
   color: inherit;
 }
@@ -104,8 +114,26 @@ select {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 48px;
-  padding: 24px 0;
+  gap: 16px;
+  padding: 10px 0;
+}
+
+.sketch-shell .site-header__inner,
+.sketch-shell .site-main {
+  width: calc(100% - (2 * var(--page-gutter)));
+  max-width: none;
+}
+
+.sketch-shell .site-logo img {
+  width: 140px;
+  height: auto;
+}
+
+.sketch-page {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr) auto;
 }
 
 .sketch-wordmark {
@@ -144,73 +172,59 @@ select {
 }
 
 .sketch-intro {
-  max-width: 720px;
-  padding: 72px 0 56px;
-}
-
-.sketch-eyebrow,
-.control-eyebrow {
-  margin: 0 0 16px;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.sketch-eyebrow {
-  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
 }
 
 .sketch-intro h1 {
   margin: 0;
-  font-size: clamp(2.5rem, 7vw, 5rem);
+  font-size: 1.75rem;
   font-weight: 500;
   line-height: 0.98;
   letter-spacing: -0.035em;
 }
 
-.sketch-intro > p:last-child {
-  max-width: 620px;
-  margin: 28px 0 0;
-  font-size: clamp(1.15rem, 2vw, 1.4rem);
-  line-height: 1.5;
+.sketch-intro a {
+  font-size: 0.8rem;
+  text-underline-offset: 0.2em;
 }
 
 .workspace {
   display: grid;
-  min-height: 680px;
-  grid-template-columns: minmax(270px, 330px) minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+  grid-template-columns: 300px minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
   border: 1px solid var(--colour-rule-strong);
 }
 
 .control-panel {
   display: flex;
+  min-width: 0;
   min-height: 0;
   flex-direction: column;
-  gap: 24px;
-  padding: 32px;
+  gap: 16px;
+  padding: 16px;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
   background: var(--colour-background);
   border-right: 1px solid var(--colour-rule-strong);
 }
 
-.control-eyebrow {
-  margin-bottom: 10px;
-  font-size: 0.8rem;
-  letter-spacing: 0.08em;
+.control-panel > * {
+  flex-shrink: 0;
 }
 
 .control-panel h2 {
   margin: 0;
-  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  font-size: 1.2rem;
   font-weight: 500;
   line-height: 1.05;
   letter-spacing: -0.025em;
-}
-
-.intro {
-  margin: 14px 0 0;
-  color: var(--colour-muted);
-  font-size: 0.95rem;
-  line-height: 1.55;
 }
 
 .dimension-controls {
@@ -347,16 +361,11 @@ button.primary:hover {
   background: var(--colour-background);
 }
 
-.hint,
 .status {
   margin: 0;
   color: var(--colour-muted);
   font-size: 0.75rem;
   line-height: 1.5;
-}
-
-.hint {
-  margin-top: auto;
 }
 
 .status {
@@ -377,6 +386,8 @@ button.primary:hover {
 }
 
 #viewport {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
@@ -388,7 +399,10 @@ button.primary:hover {
   top: 16px;
   left: 16px;
   display: flex;
-  gap: 14px;
+  flex-wrap: wrap;
+  max-width: calc(100% - 32px);
+  gap: 6px 14px;
+  pointer-events: none;
   padding: 9px 12px;
   color: #444;
   font-size: 0.75rem;
@@ -428,9 +442,16 @@ button.primary:hover {
 
 .sketch-note {
   margin: 0;
-  padding: 20px 0 72px;
+  padding: 8px 0;
   color: var(--colour-muted);
-  font-size: 0.85rem;
+  font-size: 0.75rem;
+}
+
+.sketch-help {
+  width: min(720px, calc(100% - (2 * var(--page-gutter))));
+  margin: 0 auto;
+  padding: 32px 0;
+  line-height: 1.5;
 }
 
 .sketch-note a {
@@ -473,43 +494,45 @@ button.primary:hover {
 }
 
 @media (max-width: 48rem) {
-  .site-header__inner,
   .site-footer__inner,
-  .site-main {
+  .sketch-shell .site-header__inner,
+  .sketch-shell .site-main {
     width: min(var(--page-width), calc(100% - (2 * var(--page-gutter-mobile))));
   }
 
   .site-header__inner {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 20px;
-    padding: 18px 0;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    padding: 8px 0;
   }
 
   .site-nav {
-    width: 100%;
-    gap: 12px 20px;
+    width: auto;
+    gap: 4px 16px;
   }
 
-  .sketch-intro {
-    padding: 56px 0 44px;
+  .site-nav a {
+    padding: 8px 0;
+    font-size: 0.8rem;
   }
 
   .workspace {
     min-height: 0;
     grid-template-columns: 1fr;
-    grid-template-rows: auto minmax(540px, 65dvh);
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
   }
 
   .control-panel {
-    gap: 18px;
-    padding: 24px;
+    grid-row: 2;
+    gap: 12px;
+    padding: 12px;
     border-right: 0;
-    border-bottom: 1px solid var(--colour-rule-strong);
+    border-top: 1px solid var(--colour-rule-strong);
   }
 
-  .hint {
-    margin-top: 0;
+  .viewport-wrap {
+    grid-row: 1;
   }
 
   .viewport-key {
@@ -529,6 +552,20 @@ button.primary:hover {
   }
 }
 
+/* Side-by-side panes preserve useful model height on phones in landscape. */
+@media (min-width: 36rem) and (max-width: 48rem) and (max-height: 32rem) {
+  .workspace {
+    grid-template-columns: 240px minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .control-panel {
+    grid-row: 1;
+    border-top: 0;
+    border-right: 1px solid var(--colour-rule-strong);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -543,10 +580,12 @@ button.primary:hover {
   .viewport-key,
   .site-footer,
   .sketch-intro,
+  .sketch-help,
   .sketch-note {
     display: none;
   }
 
+  .sketch-shell,
   .site-main,
   .workspace,
   .viewport-wrap {
@@ -554,5 +593,9 @@ button.primary:hover {
     width: 100%;
     height: 100%;
     border: 0;
+  }
+
+  #viewport {
+    position: static;
   }
 }

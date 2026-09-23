@@ -104,3 +104,115 @@ test('dimension changes fit the building and retain a rotated, panned view', asy
     0.0001,
   );
 });
+
+test('browser resizing and orientation changes preserve the current camera', async ({ page }) => {
+  await page.clock.install();
+  await page.goto('/');
+  const viewport = page.locator('#viewport');
+  const rect = await viewport.boundingBox();
+  if (!rect) throw new Error('Missing viewport');
+  await page.mouse.move(rect.x + rect.width / 2, rect.y + rect.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(rect.x + rect.width / 2 + 50, rect.y + rect.height / 2 + 20, { steps: 8 });
+  await page.mouse.up();
+  await page.clock.runFor(3000);
+  const initial = await cameraState(page);
+  expect(
+    initial.direction.distanceTo(new THREE.Vector3(1, -1.25, 0.85).normalize()),
+  ).toBeGreaterThan(0.05);
+  for (const size of [
+    { width: 1600, height: 900 },
+    { width: 390, height: 844 },
+    { width: 740, height: 360 },
+    { width: 390, height: 650 },
+  ]) {
+    await page.setViewportSize(size);
+    await page.clock.runFor(100);
+    const state = await cameraState(page);
+    expect(state.direction.distanceTo(initial.direction)).toBeLessThan(0.0001);
+    expect(state.position.distanceTo(initial.position)).toBeLessThan(0.0001);
+    expect(state.target.distanceTo(initial.target)).toBeLessThan(0.0001);
+    await expect
+      .poll(() =>
+        viewport.evaluate((element) => {
+          const canvas = element as HTMLCanvasElement;
+          return Math.abs(canvas.width / canvas.height - canvas.clientWidth / canvas.clientHeight);
+        }),
+      )
+      .toBeLessThan(0.01);
+  }
+});
+
+test('phone touch gestures orbit and zoom while controls scroll independently', async ({
+  page,
+  context,
+  isMobile,
+}) => {
+  test.skip(!isMobile, 'Touch behaviour is exercised in the phone project.');
+  await page.clock.install();
+  await page.goto('/');
+  const session = await context.newCDPSession(page);
+  const viewport = await page.locator('#viewport').boundingBox();
+  if (!viewport) throw new Error('Missing viewport');
+  const x = viewport.x + viewport.width / 2;
+  const y = viewport.y + viewport.height / 2;
+  const initial = await cameraState(page);
+  await session.send('Input.dispatchTouchEvent', {
+    type: 'touchStart',
+    touchPoints: [{ x, y, id: 0 }],
+  });
+  for (let i = 1; i <= 8; i++) {
+    await session.send('Input.dispatchTouchEvent', {
+      type: 'touchMove',
+      touchPoints: [{ x: x + i * 5, y: y + i * 2, id: 0 }],
+    });
+  }
+  await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await page.clock.runFor(3000);
+  const rotated = await cameraState(page);
+  expect(rotated.direction.distanceTo(initial.direction)).toBeGreaterThan(0.05);
+  await session.send('Input.dispatchTouchEvent', {
+    type: 'touchStart',
+    touchPoints: [
+      { x: x - 30, y, id: 0 },
+      { x: x + 30, y, id: 1 },
+    ],
+  });
+  for (let i = 1; i <= 8; i++) {
+    await session.send('Input.dispatchTouchEvent', {
+      type: 'touchMove',
+      touchPoints: [
+        { x: x - 30 - i * 5, y, id: 0 },
+        { x: x + 30 + i * 5, y, id: 1 },
+      ],
+    });
+  }
+  await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await page.clock.runFor(3000);
+  const zoomed = await cameraState(page);
+  expect(zoomed.position.distanceTo(zoomed.target)).toBeLessThan(
+    rotated.position.distanceTo(rotated.target) * 0.9,
+  );
+  await page.locator('.control-panel').evaluate((panel) => {
+    panel.scrollTop = 0;
+  });
+  const panel = await page.locator('.control-panel').boundingBox();
+  if (!panel) throw new Error('Missing controls');
+  const startY = panel.y + panel.height - 30;
+  await session.send('Input.dispatchTouchEvent', {
+    type: 'touchStart',
+    touchPoints: [{ x: panel.x + 20, y: startY, id: 0 }],
+  });
+  for (let i = 1; i <= 10; i++) {
+    await session.send('Input.dispatchTouchEvent', {
+      type: 'touchMove',
+      touchPoints: [{ x: panel.x + 20, y: startY - i * 15, id: 0 }],
+    });
+  }
+  await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await expect
+    .poll(() => page.locator('.control-panel').evaluate((panel) => panel.scrollTop))
+    .toBeGreaterThan(50);
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
+  await session.detach();
+});
