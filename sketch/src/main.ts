@@ -46,8 +46,9 @@ let renderer: SketchRenderer | undefined;
 
 function updateModuleControls(): void {
   const state = renderer?.exampleState();
-  showModule.disabled = !!model.facade;
-  moveModule.disabled = !state?.visible || state.moving;
+  showModule.disabled = !!state?.moving;
+  facadeSelect.disabled = !!state?.moving;
+  moveModule.disabled = !state?.visible || state.moving || !!model.facade;
   moveModule.textContent = state?.moving
     ? state.withdrawn
       ? 'Withdrawing module…'
@@ -56,7 +57,7 @@ function updateModuleControls(): void {
       ? 'Insert module'
       : 'Withdraw module';
   moduleHelp.textContent = model.facade
-    ? 'Example module hidden while accommodation facades are shown.'
+    ? 'Remove facades to move the example module.'
     : 'One illustrative 1CCC module; not a placed module in saved XML.';
 }
 showModule.addEventListener('change', () => renderer?.showModule(showModule.checked));
@@ -196,7 +197,7 @@ facadeSelect.addEventListener('change', () => {
     ...model,
     facade: isFacadeStyleId(styleId) ? { styleId } : undefined,
   };
-  renderer.setModel(model, renderer.cameraState());
+  renderer.setModel(model, renderer.cameraState(), false, true);
   announce(
     model.facade
       ? `${FACADE_STYLES.find((style) => style.id === model.facade?.styleId)?.label} on all cells`

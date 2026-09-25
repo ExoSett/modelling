@@ -32,8 +32,15 @@ test('reduced motion changes endpoints immediately and rebuilds cancel movement'
   await expect(page.locator('#move-module')).toHaveText('Withdraw module');
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.locator('#move-module').click();
+  await expect(page.locator('#facade-style')).toBeDisabled();
+  await expect(page.locator('#move-module')).toHaveText('Insert module');
   await page.locator('#facade-style').selectOption('stone-bars');
   await expect(page.locator('#move-module')).toBeDisabled();
+  await expect(page.locator('#move-module')).toHaveText('Insert module');
+  await page.locator('#show-module').uncheck();
+  await page.locator('#show-module').check();
+  await expect(page.locator('#move-module')).toHaveText('Insert module');
   await page.locator('#facade-style').selectOption('');
-  await expect(page.locator('#move-module')).toHaveText('Withdraw module');
+  await expect(page.locator('#move-module')).toHaveText('Insert module');
+  await expect(page.locator('#move-module')).toBeEnabled();
 });

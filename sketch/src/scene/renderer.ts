@@ -24,7 +24,7 @@ export class SketchRenderer {
 
   exampleState(): { visible: boolean; withdrawn: boolean; moving: boolean } {
     return {
-      visible: this.showExample && !this.hasFacade,
+      visible: this.showExample,
       withdrawn: this.withdrawn,
       moving: !!this.motion,
     };
@@ -33,11 +33,8 @@ export class SketchRenderer {
   showModule(show: boolean): void {
     this.showExample = show;
     this.motion = undefined;
-    this.withdrawn = false;
-    this.demonstrationBounds = undefined;
     if (this.example) {
-      this.example.group.visible = show && !this.hasFacade;
-      this.example.module.position.y = 0;
+      this.example.group.visible = show;
     }
     this.fitShadowCamera();
     this.requestRender();
@@ -45,7 +42,14 @@ export class SketchRenderer {
   }
 
   moveModule(): void {
-    if (!this.example || !this.exampleState().visible || this.motion || !this.building) return;
+    if (
+      !this.example ||
+      !this.exampleState().visible ||
+      this.hasFacade ||
+      this.motion ||
+      !this.building
+    )
+      return;
     // Fit the whole travel once, then keep the camera steady during movement.
     const module = this.example.module;
     const previousY = module.position.y;
@@ -109,7 +113,12 @@ export class SketchRenderer {
     this.resize();
   }
 
-  setModel(model: SketchModel, cameraState?: CameraState, reframe = false): void {
+  setModel(
+    model: SketchModel,
+    cameraState?: CameraState,
+    reframe = false,
+    preserveExample = false,
+  ): void {
     const previousCenter = this.building
       ? (this.demonstrationBounds ?? new THREE.Box3().setFromObject(this.building)).getCenter(
           new THREE.Vector3(),
@@ -120,12 +129,15 @@ export class SketchRenderer {
       disposeBuilding(this.building);
     }
     this.motion = undefined;
-    this.withdrawn = false;
-    this.demonstrationBounds = undefined;
+    if (!preserveExample) {
+      this.withdrawn = false;
+      this.demonstrationBounds = undefined;
+    }
     this.hasFacade = !!model.facade;
     this.building = buildBuilding(model);
     this.example = buildExampleModule();
-    this.example.group.visible = this.showExample && !this.hasFacade;
+    this.example.group.visible = this.showExample;
+    this.example.module.position.y = this.withdrawn ? -MODULE_TRAVEL : 0;
     this.building.children[0]!.children[0]!.add(this.example.group);
     this.scene.add(this.building);
     this.fitShadowCamera();

@@ -26,3 +26,18 @@ describe('illustrative module supports', () => {
     disposeBuilding(group);
   });
 });
+
+it('keeps every facade treatment clear of the installed module envelope', async () => {
+  const { buildFacades } = await import('../src/scene/facades');
+  const { FACADE_STYLES } = await import('../src/model/model');
+  const { group, module } = buildExampleModule();
+  const moduleBounds = new THREE.Box3().setFromObject(module);
+  for (const style of FACADE_STYLES) {
+    const facade = buildFacades({ cellsWide: 1, cellsHigh: 1, facade: { styleId: style.id } })!;
+    const facadeBounds = new THREE.Box3().setFromObject(facade);
+    expect(facadeBounds.max.y).toBeLessThan(moduleBounds.min.y);
+    expect(moduleBounds.min.y - facadeBounds.max.y).toBeCloseTo(0.03);
+    disposeBuilding(facade);
+  }
+  disposeBuilding(group);
+});
