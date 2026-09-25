@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import type { CameraState, SketchModel } from '../model/model';
 import { buildBuilding, disposeBuilding } from './building';
+import { buildExampleModule, MODULE_TRAVEL } from './example-module';
 
 export class SketchRenderer {
   private readonly scene = new THREE.Scene();
@@ -12,6 +13,57 @@ export class SketchRenderer {
   private readonly sun = new THREE.DirectionalLight(0xffffff, 3.2);
   private building?: THREE.Group;
   private requestedFrame?: number;
+
+  private example?: ReturnType<typeof buildExampleModule>;
+  private showExample = true;
+  private hasFacade = false;
+  private withdrawn = false;
+  private motion?: { start: number; from: number; to: number };
+  private demonstrationBounds?: THREE.Box3;
+  onExampleChange?: () => void;
+
+  exampleState(): { visible: boolean; withdrawn: boolean; moving: boolean } {
+    return {
+      visible: this.showExample && !this.hasFacade,
+      withdrawn: this.withdrawn,
+      moving: !!this.motion,
+    };
+  }
+
+  showModule(show: boolean): void {
+    this.showExample = show;
+    this.motion = undefined;
+    this.withdrawn = false;
+    this.demonstrationBounds = undefined;
+    if (this.example) {
+      this.example.group.visible = show && !this.hasFacade;
+      this.example.module.position.y = 0;
+    }
+    this.fitShadowCamera();
+    this.requestRender();
+    this.onExampleChange?.();
+  }
+
+  moveModule(): void {
+    if (!this.example || !this.exampleState().visible || this.motion || !this.building) return;
+    // Fit the whole travel once, then keep the camera steady during movement.
+    const module = this.example.module;
+    const previousY = module.position.y;
+    module.position.y = 0;
+    const bounds = new THREE.Box3().setFromObject(this.building);
+    module.position.y = -MODULE_TRAVEL;
+    bounds.union(new THREE.Box3().setFromObject(this.building));
+    module.position.y = previousY;
+    this.demonstrationBounds = bounds;
+    this.fitShadowCamera();
+    this.fitView(this.camera.position.clone().sub(this.controls.target).normalize());
+    this.withdrawn = !this.withdrawn;
+    const to = this.withdrawn ? -MODULE_TRAVEL : 0;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) module.position.y = to;
+    else this.motion = { start: performance.now(), from: previousY, to };
+    this.requestRender();
+    this.onExampleChange?.();
+  }
 
   constructor(private readonly canvas: HTMLCanvasElement) {
     this.renderer = new THREE.WebGLRenderer({
@@ -59,13 +111,22 @@ export class SketchRenderer {
 
   setModel(model: SketchModel, cameraState?: CameraState, reframe = false): void {
     const previousCenter = this.building
-      ? new THREE.Box3().setFromObject(this.building).getCenter(new THREE.Vector3())
+      ? (this.demonstrationBounds ?? new THREE.Box3().setFromObject(this.building)).getCenter(
+          new THREE.Vector3(),
+        )
       : undefined;
     if (this.building) {
       this.scene.remove(this.building);
       disposeBuilding(this.building);
     }
+    this.motion = undefined;
+    this.withdrawn = false;
+    this.demonstrationBounds = undefined;
+    this.hasFacade = !!model.facade;
     this.building = buildBuilding(model);
+    this.example = buildExampleModule();
+    this.example.group.visible = this.showExample && !this.hasFacade;
+    this.building.children[0]!.children[0]!.add(this.example.group);
     this.scene.add(this.building);
     this.fitShadowCamera();
 
@@ -75,13 +136,14 @@ export class SketchRenderer {
       this.fitView(direction, panOffset);
     } else if (cameraState) this.setCameraState(cameraState);
     else this.resetView();
+    this.onExampleChange?.();
   }
 
   private fitShadowCamera(): void {
     if (!this.building) return;
-    const sphere = new THREE.Box3()
-      .setFromObject(this.building)
-      .getBoundingSphere(new THREE.Sphere());
+    const sphere = (
+      this.demonstrationBounds ?? new THREE.Box3().setFromObject(this.building)
+    ).getBoundingSphere(new THREE.Sphere());
     const radius = Math.max(sphere.radius, 3);
     const lightOffset = new THREE.Vector3(-16, -20, 28).normalize().multiplyScalar(radius * 2.5);
     const extent = radius * 1.2;
@@ -109,7 +171,7 @@ export class SketchRenderer {
     this.controls.enableDamping = false;
     this.controls.update();
     this.controls.enableDamping = damping;
-    const box = new THREE.Box3().setFromObject(this.building);
+    const box = this.demonstrationBounds ?? new THREE.Box3().setFromObject(this.building);
     const sphere = box.getBoundingSphere(new THREE.Sphere());
     // Enclose the building around the retained orbit target, including a user's pan.
     const radius = Math.max(sphere.radius + panOffset.length(), 3);
@@ -170,6 +232,19 @@ export class SketchRenderer {
     if (this.requestedFrame !== undefined) return;
     this.requestedFrame = requestAnimationFrame(() => {
       this.requestedFrame = undefined;
+      if (this.motion && this.example) {
+        const t = Math.min((performance.now() - this.motion.start) / 1800, 1);
+        const eased = t * t * (3 - 2 * t);
+        this.example.module.position.y = THREE.MathUtils.lerp(
+          this.motion.from,
+          this.motion.to,
+          eased,
+        );
+        if (t === 1) {
+          this.motion = undefined;
+          this.onExampleChange?.();
+        } else this.requestRender();
+      }
       this.controls.update();
       this.render();
     });

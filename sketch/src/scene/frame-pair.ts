@@ -2,7 +2,9 @@ import * as THREE from 'three';
 import { DIMENSIONS_METRES, type SketchModel } from '../model/model';
 import { buildFacades } from './facades';
 
-const FRAME_PROFILE = 0.12;
+// Illustrative member sizes, not structural specifications.
+const COLUMN_PROFILE = 0.132;
+const BEAM_PROFILE = 0.108;
 const NODE_SIZE = 0.19;
 
 const accommodationMaterial = new THREE.MeshStandardMaterial({
@@ -61,13 +63,13 @@ function buildFrame(
   for (let xIndex = 0; xIndex <= cellsWide; xIndex += 1) {
     const x = xIndex * cellWidth;
     for (const y of [yStart, yEnd]) {
-      frame.add(member(FRAME_PROFILE, FRAME_PROFILE, height, x, y, height / 2, material));
+      frame.add(member(COLUMN_PROFILE, COLUMN_PROFILE, height, x, y, height / 2, material));
     }
 
     for (let zIndex = 0; zIndex <= cellsHigh; zIndex += 1) {
       const z = zIndex * cellHeight;
       frame.add(
-        member(FRAME_PROFILE, cellDepth, FRAME_PROFILE, x, yStart + cellDepth / 2, z, material),
+        member(BEAM_PROFILE, cellDepth, BEAM_PROFILE, x, yStart + cellDepth / 2, z, material),
       );
       if (includeNodes) {
         frame.add(node(x, yStart, z), node(x, yEnd, z));
@@ -78,7 +80,7 @@ function buildFrame(
   for (let zIndex = 0; zIndex <= cellsHigh; zIndex += 1) {
     const z = zIndex * cellHeight;
     for (const y of [yStart, yEnd]) {
-      frame.add(member(width, FRAME_PROFILE, FRAME_PROFILE, width / 2, y, z, material));
+      frame.add(member(width, BEAM_PROFILE, BEAM_PROFILE, width / 2, y, z, material));
     }
   }
 

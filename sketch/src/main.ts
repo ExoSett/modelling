@@ -33,6 +33,9 @@ const depthHelp = element<HTMLElement>('depth-help');
 const roofSelect = element<HTMLSelectElement>('roof-type');
 const roofHelp = element<HTMLElement>('roof-help');
 const facadeSelect = element<HTMLSelectElement>('facade-style');
+const showModule = element<HTMLInputElement>('show-module');
+const moveModule = element<HTMLButtonElement>('move-module');
+const moduleHelp = element<HTMLElement>('module-help');
 const fileInput = element<HTMLInputElement>('xml-file');
 const status = element<HTMLOutputElement>('status');
 const modelSize = element<HTMLElement>('model-size');
@@ -40,6 +43,24 @@ const webglError = element<HTMLElement>('webgl-error');
 
 let model: SketchModel = modelFromUrl(new URL(window.location.href));
 let renderer: SketchRenderer | undefined;
+
+function updateModuleControls(): void {
+  const state = renderer?.exampleState();
+  showModule.disabled = !!model.facade;
+  moveModule.disabled = !state?.visible || state.moving;
+  moveModule.textContent = state?.moving
+    ? state.withdrawn
+      ? 'Withdrawing module…'
+      : 'Inserting module…'
+    : state?.withdrawn
+      ? 'Insert module'
+      : 'Withdraw module';
+  moduleHelp.textContent = model.facade
+    ? 'Example module hidden while accommodation facades are shown.'
+    : 'One illustrative 1CCC module; not a placed module in saved XML.';
+}
+showModule.addEventListener('change', () => renderer?.showModule(showModule.checked));
+moveModule.addEventListener('click', () => renderer?.moveModule());
 
 function announce(message: string, error = false): void {
   status.textContent = message;
@@ -230,6 +251,7 @@ fileInput.addEventListener('change', async () => {
 
 try {
   renderer = new SketchRenderer(canvas);
+  renderer.onExampleChange = updateModuleControls;
   renderer.setModel(model);
   writeInputs();
   updateFacts();

@@ -12,7 +12,7 @@ for (const size of [
   }) => {
     await page.setViewportSize(size);
     await page.goto('/');
-    await expect(page.locator('#status')).toHaveText('One pair: 3 high × 5 wide');
+    await expect(page.locator('#status')).toHaveText('One pair: 1 high × 1 wide');
     const workspace = await page.locator('.workspace').boundingBox();
     const canvas = await page.locator('#viewport').boundingBox();
     expect(workspace).not.toBeNull();

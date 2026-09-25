@@ -53,7 +53,7 @@ test('dimension changes fit the building and retain a rotated, panned view', asy
   const initial = await cameraState(page);
   const defaultDirection = new THREE.Vector3(1, -1.25, 0.85).normalize();
   expect(initial.direction.distanceTo(defaultDirection)).toBeGreaterThan(0.1);
-  let model: SketchModel = { cellsWide: 5, cellsHigh: 3, layout: 'double', depth: 0 };
+  let model: SketchModel = { cellsWide: 1, cellsHigh: 1, layout: 'double', depth: 0 };
   const pan = initial.target.clone().sub(bounds(model).getCenter(new THREE.Vector3()));
   expect(pan.length()).toBeGreaterThan(0.01);
   const distances: number[] = [];

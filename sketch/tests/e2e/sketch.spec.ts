@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 test('updates the model dimensions and keeps controls usable', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/?layout=1&h=3&w=5&d=0&roof=none&accommodation_facade=none');
   await expect(page.getByRole('heading', { name: 'Shape a simple building' })).toBeVisible();
   await expect(page.locator('#status')).toHaveText('One pair: 3 high × 5 wide');
 
@@ -18,7 +18,7 @@ test('updates the model dimensions and keeps controls usable', async ({ page }) 
 test('supports ten cells high and marks dimensions beyond their limits in red', async ({
   page,
 }) => {
-  await page.goto('/');
+  await page.goto('/?layout=1&h=3&w=5&d=0&roof=none&accommodation_facade=none');
   const widthInput = page.locator('#cells-wide');
   const heightInput = page.locator('#cells-high');
 
@@ -33,7 +33,7 @@ test('supports ten cells high and marks dimensions beyond their limits in red', 
 });
 
 test('downloads XML and a PNG from the current model', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/?layout=1&h=3&w=5&d=0&roof=none&accommodation_facade=none');
 
   const xmlDownloadPromise = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Save XML' }).click();
@@ -73,7 +73,7 @@ test('downloads XML and a PNG from the current model', async ({ page }) => {
 test('applies one facade style to all cells and preserves it when the grid changes', async ({
   page,
 }) => {
-  await page.goto('/');
+  await page.goto('/?layout=1&h=3&w=5&d=0&roof=none&accommodation_facade=none');
 
   await page.locator('#facade-style').selectOption('brick-window');
   await expect(page.locator('#status')).toHaveText('Brick with window on all cells');
@@ -102,7 +102,7 @@ test('applies one facade style to all cells and preserves it when the grid chang
 });
 
 test('switches between facing-pair and quadrangle layouts', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/?layout=1&h=3&w=5&d=0&roof=none&accommodation_facade=none');
   const layout = page.locator('#building-layout');
   const depthControl = page.locator('#depth-control');
   await page.locator('#facade-style').selectOption('timber-balcony');
@@ -152,15 +152,15 @@ test('loads a complete URL and rejects an invalid one as a whole', async ({ page
 
   await page.goto('/?layout=4&h=2&w=8&d=99&roof=space-frame&accommodation_facade=stone-bars');
   await expect(page.locator('#building-layout')).toHaveValue('single');
-  await expect(page.locator('#cells-high')).toHaveValue('3');
-  await expect(page.locator('#cells-wide')).toHaveValue('5');
+  await expect(page.locator('#cells-high')).toHaveValue('1');
+  await expect(page.locator('#cells-wide')).toHaveValue('1');
   await expect(page.locator('#roof-type')).toHaveValue('none');
   await expect(page.locator('#facade-style')).toHaveValue('');
 });
 
 test('copies a canonical complete link', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-  await page.goto('/');
+  await page.goto('/?layout=1&h=3&w=5&d=0&roof=none&accommodation_facade=none');
   await page.locator('#building-layout').selectOption('double');
   await page.locator('#depth').fill('4');
   await page.getByRole('button', { name: 'Copy link' }).click();
@@ -170,7 +170,7 @@ test('copies a canonical complete link', async ({ page, context }) => {
 });
 
 test('selects and saves a gable roof', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/?layout=1&h=3&w=5&d=0&roof=none&accommodation_facade=none');
   await page.locator('#roof-type').selectOption('gable');
   await expect(page.locator('#status')).toHaveText('Gable roof selected');
 
@@ -184,7 +184,7 @@ test('selects and saves a gable roof', async ({ page }) => {
 });
 
 test('offers a space frame roof for a single frame pair', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/?layout=1&h=3&w=5&d=0&roof=none&accommodation_facade=none');
   await expect(page.locator('#roof-type option')).toHaveText([
     'None',
     'Flat',

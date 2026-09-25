@@ -96,8 +96,8 @@ export function isFacadeStyleId(value: string): value is FacadeStyleId {
 }
 
 export const DEFAULT_MODEL: SketchModel = {
-  cellsWide: 5,
-  cellsHigh: 3,
+  cellsWide: 1,
+  cellsHigh: 1,
   layout: 'single',
   depth: 0,
   roof: 'none',
