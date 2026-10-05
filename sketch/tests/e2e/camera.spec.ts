@@ -31,7 +31,6 @@ function bounds(model: SketchModel) {
 }
 
 test('dimension changes fit the building and retain a rotated, panned view', async ({ page }) => {
-  test.setTimeout(60_000);
   await page.clock.install({ time: new Date('2026-01-01T00:00:00Z') });
   await page.goto('/');
   await page.locator('#building-layout').selectOption('double');
@@ -71,7 +70,9 @@ test('dimension changes fit the building and retain a rotated, panned view', asy
   ];
   for (const change of changes) {
     await page.locator(change.input).fill(String(change.value));
-    await page.clock.runFor(350);
+    // Check the completed fit without rendering every frame of these large models.
+    // Intermediate animation frames are covered by the transition tests below.
+    await page.clock.fastForward(350);
     model = { ...model, ...change.model };
     const state = await cameraState(page);
     expect(state.direction.distanceTo(initial.direction)).toBeLessThan(0.0001);
@@ -99,7 +100,7 @@ test('dimension changes fit the building and retain a rotated, panned view', asy
   expect(distances[4]!).toBeGreaterThan(distances[0]!);
   expect(distances[7]!).toBeLessThan(distances[4]! / 2);
   await page.locator('#reset-view').click();
-  await page.clock.runFor(350);
+  await page.clock.fastForward(350);
   const reset = await cameraState(page);
   expect(reset.direction.distanceTo(defaultDirection)).toBeLessThan(0.0001);
   expect(reset.target.distanceTo(bounds(model).getCenter(new THREE.Vector3()))).toBeLessThan(
