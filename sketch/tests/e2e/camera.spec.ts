@@ -5,7 +5,8 @@ import type { SketchModel } from '../../src/model/model';
 
 async function cameraState(page: Page) {
   const downloaded = page.waitForEvent('download');
-  await page.locator('#save-xml').click();
+  // Read the camera without waiting for frame-based stability on the paused clock.
+  await page.locator('#save-xml').dispatchEvent('click');
   const stream = await (await downloaded).createReadStream();
   let xml = '';
   for await (const chunk of stream) xml += chunk.toString();
@@ -30,6 +31,7 @@ function bounds(model: SketchModel) {
 }
 
 test('dimension changes fit the building and retain a rotated, panned view', async ({ page }) => {
+  test.setTimeout(60_000);
   await page.clock.install({ time: new Date('2026-01-01T00:00:00Z') });
   await page.goto('/');
   await page.locator('#building-layout').selectOption('double');
@@ -69,7 +71,7 @@ test('dimension changes fit the building and retain a rotated, panned view', asy
   ];
   for (const change of changes) {
     await page.locator(change.input).fill(String(change.value));
-    await page.clock.runFor(32);
+    await page.clock.runFor(350);
     model = { ...model, ...change.model };
     const state = await cameraState(page);
     expect(state.direction.distanceTo(initial.direction)).toBeLessThan(0.0001);
@@ -97,7 +99,7 @@ test('dimension changes fit the building and retain a rotated, panned view', asy
   expect(distances[4]!).toBeGreaterThan(distances[0]!);
   expect(distances[7]!).toBeLessThan(distances[4]! / 2);
   await page.locator('#reset-view').click();
-  await page.clock.runFor(32);
+  await page.clock.runFor(350);
   const reset = await cameraState(page);
   expect(reset.direction.distanceTo(defaultDirection)).toBeLessThan(0.0001);
   expect(reset.target.distanceTo(bounds(model).getCenter(new THREE.Vector3()))).toBeLessThan(
@@ -216,3 +218,43 @@ test('phone touch gestures orbit and zoom while controls scroll independently', 
   expect(await page.evaluate(() => window.scrollY)).toBe(0);
   await session.detach();
 });
+
+for (const reducedMotion of ['no-preference', 'reduce'] as const) {
+  test(`automatic zoom transitions respect ${reducedMotion}`, async ({ page }) => {
+    await page.emulateMedia({ reducedMotion });
+    await page.clock.install({ time: new Date('2026-01-01T00:00:00Z') });
+    await page.goto('/');
+    await page.clock.pauseAt(new Date('2026-01-01T00:01:00Z'));
+    const initial = await cameraState(page);
+    await page.locator('#cells-wide').fill('12');
+    const start = await cameraState(page);
+    if (reducedMotion === 'no-preference') {
+      expect(start.position.distanceTo(initial.position)).toBeLessThan(0.0001);
+      await page.clock.runFor(150);
+      const middle = await cameraState(page);
+      await page.clock.runFor(200);
+      const end = await cameraState(page);
+      expect(middle.position.distanceTo(initial.position)).toBeGreaterThan(0.1);
+      expect(middle.position.distanceTo(end.position)).toBeGreaterThan(0.1);
+      await page.clock.runFor(500);
+      expect((await cameraState(page)).position.distanceTo(end.position)).toBeLessThan(0.0001);
+      // A second fit retargets from the visible camera; manual input cancels it.
+      await page.locator('#cells-wide').fill('2');
+      await page.clock.runFor(100);
+      const viewport = await page.locator('#viewport').boundingBox();
+      if (!viewport) throw new Error('Missing viewport');
+      await page.mouse.move(viewport.x + viewport.width / 2, viewport.y + viewport.height / 2);
+      await page.mouse.down();
+      await page.mouse.up();
+      const interrupted = await cameraState(page);
+      await page.clock.runFor(500);
+      expect((await cameraState(page)).position.distanceTo(interrupted.position)).toBeLessThan(
+        0.0001,
+      );
+    } else {
+      expect(start.position.distanceTo(initial.position)).toBeGreaterThan(1);
+      await page.clock.runFor(500);
+      expect((await cameraState(page)).position.distanceTo(start.position)).toBeLessThan(0.0001);
+    }
+  });
+}

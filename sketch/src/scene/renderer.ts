@@ -13,6 +13,15 @@ export class SketchRenderer {
   private readonly sun = new THREE.DirectionalLight(0xffffff, 3.2);
   private building?: THREE.Group;
   private requestedFrame?: number;
+  private viewMotion?: {
+    start: number;
+    fromPosition: THREE.Vector3;
+    fromTarget: THREE.Vector3;
+    toPosition: THREE.Vector3;
+    toTarget: THREE.Vector3;
+    minDistance: number;
+    maxDistance: number;
+  };
 
   private example?: ReturnType<typeof buildExampleModule>;
   private showExample = true;
@@ -87,6 +96,7 @@ export class SketchRenderer {
     this.controls.dampingFactor = 0.07;
     this.controls.screenSpacePanning = false;
     this.controls.addEventListener('change', () => this.requestRender());
+    this.controls.addEventListener('start', () => this.finishViewMotion(false));
 
     this.scene.add(new THREE.HemisphereLight(0xffffff, 0x858585, 2.4));
     this.sun.castShadow = true;
@@ -119,6 +129,7 @@ export class SketchRenderer {
     reframe = false,
     preserveExample = false,
   ): void {
+    const retainedTarget = this.viewMotion?.toTarget.clone() ?? this.controls.target.clone();
     const previousCenter = this.building
       ? (this.demonstrationBounds ?? new THREE.Box3().setFromObject(this.building)).getCenter(
           new THREE.Vector3(),
@@ -144,10 +155,10 @@ export class SketchRenderer {
 
     if (reframe && previousCenter) {
       const direction = this.camera.position.clone().sub(this.controls.target).normalize();
-      const panOffset = this.controls.target.clone().sub(previousCenter);
+      const panOffset = retainedTarget.sub(previousCenter);
       this.fitView(direction, panOffset);
     } else if (cameraState) this.setCameraState(cameraState);
-    else this.resetView();
+    else this.resetView(!!previousCenter);
     this.onExampleChange?.();
   }
 
@@ -172,17 +183,26 @@ export class SketchRenderer {
     this.sun.shadow.needsUpdate = true;
   }
 
-  resetView(): void {
-    this.fitView(new THREE.Vector3(1, -1.25, 0.85).normalize());
+  resetView(animate = true): void {
+    this.fitView(new THREE.Vector3(1, -1.25, 0.85).normalize(), new THREE.Vector3(), animate);
   }
 
-  private fitView(viewDirection: THREE.Vector3, panOffset = new THREE.Vector3()): void {
+  private fitView(
+    viewDirection: THREE.Vector3,
+    panOffset = new THREE.Vector3(),
+    animate = true,
+  ): void {
     if (!this.building) return;
+    this.finishViewMotion(false);
     // Discard pending orbit/pan inertia before applying the retained view.
+    const position = this.camera.position.clone();
+    const target = this.controls.target.clone();
     const damping = this.controls.enableDamping;
     this.controls.enableDamping = false;
     this.controls.update();
     this.controls.enableDamping = damping;
+    this.camera.position.copy(position);
+    this.controls.target.copy(target);
     const box = this.demonstrationBounds ?? new THREE.Box3().setFromObject(this.building);
     const sphere = box.getBoundingSphere(new THREE.Sphere());
     // Enclose the building around the retained orbit target, including a user's pan.
@@ -191,14 +211,33 @@ export class SketchRenderer {
     const horizontalFov = 2 * Math.atan(Math.tan(verticalFov / 2) * this.camera.aspect);
     const fittingFov = Math.min(verticalFov, horizontalFov);
     const distance = (radius / Math.sin(fittingFov / 2)) * 1.08;
-    this.controls.target.copy(sphere.center).add(panOffset);
-    this.camera.position.copy(this.controls.target).addScaledVector(viewDirection, distance);
+    const toTarget = sphere.center.clone().add(panOffset);
+    const toPosition = toTarget.clone().addScaledVector(viewDirection, distance);
+    const minDistance = radius * 0.25;
+    const maxDistance = Math.max(radius * 8, distance * 1.1);
     this.camera.near = Math.max(radius / 100, 0.05);
-    this.camera.far = radius * 25;
+    this.camera.far = Math.max(radius * 25, this.camera.position.distanceTo(toTarget) + radius);
     this.camera.updateProjectionMatrix();
-    this.controls.minDistance = radius * 0.25;
-    this.controls.maxDistance = Math.max(radius * 8, distance * 1.1);
-    this.controls.update();
+    if (animate && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      this.viewMotion = {
+        start: performance.now(),
+        fromPosition: this.camera.position.clone(),
+        fromTarget: this.controls.target.clone(),
+        toPosition,
+        toTarget,
+        minDistance,
+        maxDistance,
+      };
+      // Keep the current view within bounds while fitting a smaller building.
+      this.controls.minDistance = Math.min(minDistance, this.controls.getDistance());
+      this.controls.maxDistance = Math.max(maxDistance, this.controls.getDistance());
+    } else {
+      this.controls.target.copy(toTarget);
+      this.camera.position.copy(toPosition);
+      this.controls.minDistance = minDistance;
+      this.controls.maxDistance = maxDistance;
+      this.controls.update();
+    }
     this.requestRender();
   }
 
@@ -209,7 +248,20 @@ export class SketchRenderer {
     };
   }
 
+  private finishViewMotion(complete: boolean): void {
+    const motion = this.viewMotion;
+    if (!motion) return;
+    this.viewMotion = undefined;
+    if (complete) {
+      this.camera.position.copy(motion.toPosition);
+      this.controls.target.copy(motion.toTarget);
+    }
+    this.controls.minDistance = Math.min(motion.minDistance, this.controls.getDistance());
+    this.controls.maxDistance = Math.max(motion.maxDistance, this.controls.getDistance());
+  }
+
   setCameraState(state: CameraState): void {
+    this.finishViewMotion(false);
     this.camera.position.set(state.position.x, state.position.y, state.position.z);
     this.controls.target.set(state.target.x, state.target.y, state.target.z);
     this.controls.update();
@@ -244,6 +296,17 @@ export class SketchRenderer {
     if (this.requestedFrame !== undefined) return;
     this.requestedFrame = requestAnimationFrame(() => {
       this.requestedFrame = undefined;
+      if (this.viewMotion) {
+        const motion = this.viewMotion;
+        const t = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+          ? 1
+          : Math.min((performance.now() - motion.start) / 300, 1);
+        const eased = t * t * (3 - 2 * t);
+        this.camera.position.lerpVectors(motion.fromPosition, motion.toPosition, eased);
+        this.controls.target.lerpVectors(motion.fromTarget, motion.toTarget, eased);
+        if (t === 1) this.finishViewMotion(true);
+        else this.requestRender();
+      }
       if (this.motion && this.example) {
         const t = Math.min((performance.now() - this.motion.start) / 1800, 1);
         const eased = t * t * (3 - 2 * t);
