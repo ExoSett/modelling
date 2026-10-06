@@ -166,7 +166,9 @@ test('copies a canonical complete link', async ({ page, context }) => {
   await page.getByRole('button', { name: 'Copy link' }).click();
   await expect(page.locator('#status')).toHaveText('Link copied');
   const copied = await page.evaluate(() => navigator.clipboard.readText());
-  expect(new URL(copied).search).toBe('?layout=2&h=3&w=5&d=4&roof=none&accommodation_facade=none');
+  expect(new URL(copied).search).toBe(
+    '?layout=2&h=3&w=5&d=4&roof=none&accommodation_facade=none&module=2',
+  );
 });
 
 test('selects and saves a gable roof', async ({ page }) => {
