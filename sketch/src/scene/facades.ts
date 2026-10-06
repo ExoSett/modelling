@@ -22,9 +22,14 @@ const surfaces = {
 } as const;
 
 const windowMaterial = new THREE.MeshStandardMaterial({
-  color: 0x263b43,
-  roughness: 0.28,
-  metalness: 0.15,
+  color: 0x78bdb0,
+  roughness: 0.2,
+  metalness: 0.05,
+  transparent: true,
+  opacity: 0.8,
+  depthWrite: false,
+  emissive: 0x78bdb0,
+  emissiveIntensity: 0.12,
 });
 const darkMaterial = new THREE.MeshStandardMaterial({ color: 0x151717, roughness: 0.6 });
 const balconyMaterial = new THREE.MeshStandardMaterial({ color: 0x363b39, roughness: 0.65 });
@@ -42,18 +47,37 @@ function box(
 ): void {
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(...size), material);
   mesh.position.set(...position);
-  mesh.castShadow = true;
+  mesh.castShadow = material !== windowMaterial;
   mesh.receiveShadow = true;
   group.add(mesh);
 }
 
-function addWindow(group: THREE.Group, width: number, height: number, barred: boolean): void {
-  const windowWidth = width * 0.52;
-  const windowHeight = height * 0.5;
-  const centreZ = height * 0.57;
+interface Opening {
+  width: number;
+  height: number;
+  centreZ: number;
+}
+
+function openingFor(width: number, height: number, sliding: boolean): Opening {
+  const openingHeight = sliding ? height * 0.76 : height * 0.5;
+  return {
+    width: width * (sliding ? 0.74 : 0.52),
+    height: openingHeight,
+    centreZ: sliding ? BALCONY_FLOOR_SURFACE_Z + openingHeight / 2 : height * 0.57,
+  };
+}
+
+function addWindow(
+  group: THREE.Group,
+  width: number,
+  opening: Opening,
+  barred: boolean,
+  sliding: boolean,
+): void {
+  const { width: windowWidth, height: windowHeight, centreZ } = opening;
   box(
     group,
-    [windowWidth, 0.035, windowHeight],
+    [windowWidth, 0.012, windowHeight],
     [width / 2, FRONT_Y - 0.07, centreZ],
     windowMaterial,
   );
@@ -64,6 +88,16 @@ function addWindow(group: THREE.Group, width: number, height: number, barred: bo
   }
   for (const z of [centreZ - windowHeight / 2, centreZ + windowHeight / 2]) {
     box(group, [windowWidth, 0.045, frameWidth], [width / 2, FRONT_Y - 0.1, z], darkMaterial);
+  }
+
+  box(group, [0.04, 0.045, windowHeight], [width / 2, FRONT_Y - 0.1, centreZ], darkMaterial);
+  if (sliding) {
+    box(
+      group,
+      [windowWidth, 0.09, 0.035],
+      [width / 2, FRONT_Y - 0.1, centreZ - windowHeight / 2],
+      darkMaterial,
+    );
   }
 
   if (barred) {
@@ -86,10 +120,54 @@ function addWindow(group: THREE.Group, width: number, height: number, barred: bo
   }
 }
 
-function addTimberJoints(group: THREE.Group, width: number, height: number): void {
+function addTimberJoints(
+  group: THREE.Group,
+  width: number,
+  height: number,
+  opening: Opening,
+): void {
+  const left = (width - opening.width) / 2;
+  const bottom = opening.centreZ - opening.height / 2;
+  const top = opening.centreZ + opening.height / 2;
   for (let x = width / 8; x < width; x += width / 8) {
-    box(group, [0.018, 0.018, height * 0.94], [x, FRONT_Y - 0.065, height / 2], darkMaterial);
+    if (x > left && x < width - left) {
+      for (const [start, end] of [
+        [0, bottom],
+        [top, height],
+      ]) {
+        box(
+          group,
+          [0.018, 0.018, end! - start!],
+          [x, FRONT_Y - 0.065, (start! + end!) / 2],
+          darkMaterial,
+        );
+      }
+    } else {
+      box(group, [0.018, 0.018, height * 0.94], [x, FRONT_Y - 0.065, height / 2], darkMaterial);
+    }
   }
+}
+
+function addWall(
+  group: THREE.Group,
+  width: number,
+  height: number,
+  opening: Opening,
+  material: THREE.Material,
+): void {
+  const sideWidth = (width - opening.width) / 2;
+  const bottom = opening.centreZ - opening.height / 2;
+  const top = opening.centreZ + opening.height / 2;
+  for (const x of [sideWidth / 2, width - sideWidth / 2]) {
+    box(group, [sideWidth, PANEL_DEPTH, height], [x, FRONT_Y, height / 2], material);
+  }
+  box(group, [opening.width, PANEL_DEPTH, bottom], [width / 2, FRONT_Y, bottom / 2], material);
+  box(
+    group,
+    [opening.width, PANEL_DEPTH, height - top],
+    [width / 2, FRONT_Y, (height + top) / 2],
+    material,
+  );
 }
 
 function addBalcony(group: THREE.Group, width: number): void {
@@ -128,12 +206,9 @@ function buildCellFacade(styleId: FacadeStyleId): THREE.Group {
   if (!style) throw new Error(`Unknown facade style: ${styleId}`);
 
   const facade = new THREE.Group();
-  box(
-    facade,
-    [cell.width, PANEL_DEPTH, cell.height],
-    [cell.width / 2, FRONT_Y, cell.height / 2],
-    surfaces[style.surface],
-  );
+  const sliding = style.form === 'balcony';
+  const opening = openingFor(cell.width, cell.height, sliding);
+  addWall(facade, cell.width, cell.height, opening, surfaces[style.surface]);
 
   const frontFaceY = FRONT_Y - PANEL_DEPTH / 2 - 0.006;
   const perimeter = new THREE.LineLoop(
@@ -148,10 +223,9 @@ function buildCellFacade(styleId: FacadeStyleId): THREE.Group {
   perimeter.name = 'facade-panel-perimeter';
   facade.add(perimeter);
 
-  if (style.surface === 'timber') addTimberJoints(facade, cell.width, cell.height);
-  if (style.form === 'window') addWindow(facade, cell.width, cell.height, false);
-  if (style.form === 'barred-window') addWindow(facade, cell.width, cell.height, true);
-  if (style.form === 'balcony') addBalcony(facade, cell.width);
+  if (style.surface === 'timber') addTimberJoints(facade, cell.width, cell.height, opening);
+  addWindow(facade, cell.width, opening, style.form === 'barred-window', sliding);
+  if (sliding) addBalcony(facade, cell.width);
   return facade;
 }
 
