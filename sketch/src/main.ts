@@ -13,7 +13,7 @@ import {
   type SketchModel,
 } from './model/model';
 import { createSketchXml, parseSketchXml } from './model/xml';
-import { modelFromUrl, urlForModel } from './model/url';
+import { modelFromUrl, moduleStateFromUrl, urlForModel } from './model/url';
 import { SketchRenderer } from './scene/renderer';
 
 function element<T extends HTMLElement>(id: string): T {
@@ -46,6 +46,7 @@ let renderer: SketchRenderer | undefined;
 
 function updateModuleControls(): void {
   const state = renderer?.exampleState();
+  if (state) showModule.checked = state.visible;
   showModule.disabled = !!state?.moving;
   facadeSelect.disabled = !!state?.moving;
   moveModule.disabled = !state?.visible || state.moving || !!model.facade;
@@ -224,7 +225,11 @@ element<HTMLButtonElement>('save-png').addEventListener('click', () => {
 
 element<HTMLButtonElement>('copy-link').addEventListener('click', async () => {
   try {
-    await navigator.clipboard.writeText(urlForModel(new URL(window.location.href), model).href);
+    const state = renderer?.exampleState();
+    const moduleState = state && !state.visible ? 0 : state?.withdrawn ? 1 : 2;
+    await navigator.clipboard.writeText(
+      urlForModel(new URL(window.location.href), model, moduleState).href,
+    );
     announce('Link copied');
   } catch {
     announce('The link could not be copied.', true);
@@ -253,7 +258,13 @@ fileInput.addEventListener('change', async () => {
 try {
   renderer = new SketchRenderer(canvas);
   renderer.onExampleChange = updateModuleControls;
-  renderer.setModel(model);
+  renderer.setModel(
+    model,
+    undefined,
+    false,
+    false,
+    moduleStateFromUrl(new URL(window.location.href)),
+  );
   writeInputs();
   updateFacts();
   announce(

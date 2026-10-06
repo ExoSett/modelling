@@ -44,3 +44,33 @@ test('reduced motion changes endpoints immediately and rebuilds cancel movement'
   await expect(page.locator('#move-module')).toHaveText('Insert module');
   await expect(page.locator('#move-module')).toBeEnabled();
 });
+
+test('shared links restore each module state and copy the movement destination', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator.clipboard, 'writeText', {
+      value: async (text: string) => {
+        document.documentElement.dataset.copiedLink = text;
+      },
+    });
+  });
+  const query = '?layout=1&h=2&w=3&d=0&roof=none&accommodation_facade=none';
+  for (const state of [0, 1, 2]) {
+    await page.goto(`/${query}&module=${state}`);
+    await expect(page.locator('#cells-wide')).toHaveValue('3');
+    await expect(page.locator('#show-module')).toBeChecked({ checked: state !== 0 });
+    await expect(page.locator('#move-module')).toHaveText(
+      state === 1 ? 'Insert module' : 'Withdraw module',
+    );
+    await page.locator('#copy-link').click();
+    await expect(page.locator('html')).toHaveAttribute(
+      'data-copied-link',
+      new RegExp(`module=${state}$`),
+    );
+  }
+  await page.locator('#move-module').click();
+  await expect(page.locator('#move-module')).toHaveText('Withdrawing module…');
+  await page.locator('#copy-link').click();
+  await expect(page.locator('html')).toHaveAttribute('data-copied-link', /module=1$/);
+});

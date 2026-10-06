@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import type { ModuleState } from '../model/url';
 import type { CameraState, SketchModel } from '../model/model';
 import { buildBuilding, disposeBuilding } from './building';
 import { buildExampleModule, MODULE_TRAVEL } from './example-module';
@@ -128,6 +129,7 @@ export class SketchRenderer {
     cameraState?: CameraState,
     reframe = false,
     preserveExample = false,
+    moduleState?: ModuleState,
   ): void {
     const retainedTarget = this.viewMotion?.toTarget.clone() ?? this.controls.target.clone();
     const previousCenter = this.building
@@ -143,6 +145,10 @@ export class SketchRenderer {
     if (!preserveExample) {
       this.withdrawn = false;
       this.demonstrationBounds = undefined;
+    }
+    if (moduleState !== undefined) {
+      this.showExample = moduleState !== 0;
+      this.withdrawn = moduleState === 1;
     }
     this.hasFacade = !!model.facade;
     this.building = buildBuilding(model);

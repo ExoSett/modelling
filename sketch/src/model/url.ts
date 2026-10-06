@@ -7,6 +7,13 @@ import {
   type SketchModel,
 } from './model';
 
+export type ModuleState = 0 | 1 | 2;
+
+export function moduleStateFromUrl(url: URL): ModuleState {
+  const value = url.searchParams.get('module');
+  return value === '0' ? 0 : value === '1' ? 1 : 2;
+}
+
 const QUERY_KEYS = ['layout', 'h', 'w', 'd', 'roof', 'accommodation_facade'] as const;
 const LAYOUT_FROM_QUERY: Record<string, BuildingLayout> = {
   '1': 'single',
@@ -23,9 +30,11 @@ export function modelFromUrl(url: URL): SketchModel {
   if (!url.search) return { ...DEFAULT_MODEL };
   const keys = Array.from(url.searchParams.keys());
   if (
-    keys.length !== QUERY_KEYS.length ||
+    keys.length !== QUERY_KEYS.length + (url.searchParams.has('module') ? 1 : 0) ||
+    (url.searchParams.has('module') &&
+      !['0', '1', '2'].includes(url.searchParams.get('module')!)) ||
     QUERY_KEYS.some((key) => !url.searchParams.has(key)) ||
-    keys.some((key) => !QUERY_KEYS.includes(key as (typeof QUERY_KEYS)[number]))
+    keys.some((key) => key !== 'module' && !QUERY_KEYS.includes(key as (typeof QUERY_KEYS)[number]))
   ) {
     return { ...DEFAULT_MODEL };
   }
@@ -52,7 +61,7 @@ export function modelFromUrl(url: URL): SketchModel {
   }
 }
 
-export function urlForModel(baseUrl: URL, model: SketchModel): URL {
+export function urlForModel(baseUrl: URL, model: SketchModel, moduleState: ModuleState = 2): URL {
   const url = new URL(baseUrl);
   url.search = '';
   url.hash = '';
@@ -63,5 +72,6 @@ export function urlForModel(baseUrl: URL, model: SketchModel): URL {
   url.searchParams.set('d', String(model.depth ?? (layout === 'quadrangle' ? 1 : 0)));
   url.searchParams.set('roof', model.roof ?? 'none');
   url.searchParams.set('accommodation_facade', model.facade?.styleId ?? 'none');
+  url.searchParams.set('module', String(moduleState));
   return url;
 }

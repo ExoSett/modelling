@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_MODEL } from '../src/model/model';
-import { modelFromUrl, urlForModel } from '../src/model/url';
+import { modelFromUrl, moduleStateFromUrl, urlForModel } from '../src/model/url';
 
 describe('Sketch URLs', () => {
   it('parses a complete valid model', () => {
@@ -30,6 +30,15 @@ describe('Sketch URLs', () => {
     }
   });
 
+  it('round-trips all module states without changing the model', () => {
+    for (const state of [0, 1, 2] as const) {
+      const url = urlForModel(new URL('https://example.com/'), DEFAULT_MODEL, state);
+      expect(moduleStateFromUrl(url)).toBe(state);
+      expect(modelFromUrl(url)).toEqual(DEFAULT_MODEL);
+    }
+    expect(moduleStateFromUrl(new URL('https://example.com/'))).toBe(2);
+  });
+
   it('creates a canonical complete URL', () => {
     const url = urlForModel(new URL('https://example.com/sketch/?old=yes#view'), {
       cellsHigh: 2,
@@ -39,7 +48,7 @@ describe('Sketch URLs', () => {
       roof: 'space-frame',
     });
     expect(url.href).toBe(
-      'https://example.com/sketch/?layout=2&h=2&w=9&d=5&roof=space-frame&accommodation_facade=none',
+      'https://example.com/sketch/?layout=2&h=2&w=9&d=5&roof=space-frame&accommodation_facade=none&module=2',
     );
   });
 });
