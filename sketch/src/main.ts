@@ -15,6 +15,7 @@ import {
 import { createSketchXml, parseSketchXml } from './model/xml';
 import { modelFromUrl, moduleStateFromUrl, urlForModel } from './model/url';
 import { SketchRenderer } from './scene/renderer';
+import { extensionFromUrl } from './extensions';
 
 function element<T extends HTMLElement>(id: string): T {
   const result = document.getElementById(id);
@@ -43,13 +44,28 @@ const webglError = element<HTMLElement>('webgl-error');
 
 let model: SketchModel = modelFromUrl(new URL(window.location.href));
 let renderer: SketchRenderer | undefined;
+let extensionActive = false;
+const greeting = document.createElement('p');
+greeting.className = 'extension-greeting';
+greeting.hidden = true;
+canvas.parentElement?.append(greeting);
+
+function leaveExtension(): void {
+  if (!extensionActive) return;
+  extensionActive = false;
+  greeting.hidden = true;
+  const url = new URL(window.location.href);
+  url.search = '';
+  window.history.replaceState(null, '', url);
+  renderer?.showModule(true);
+}
 
 function updateModuleControls(): void {
   const state = renderer?.exampleState();
   if (state) showModule.checked = state.visible;
-  showModule.disabled = !!state?.moving;
+  showModule.disabled = extensionActive || !!state?.moving;
   facadeSelect.disabled = !!state?.moving;
-  moveModule.disabled = !state?.visible || state.moving || !!model.facade;
+  moveModule.disabled = extensionActive || !state?.visible || state.moving || !!model.facade;
   moveModule.textContent = state?.moving
     ? state.withdrawn
       ? 'Withdrawing module…'
@@ -154,7 +170,15 @@ for (const style of FACADE_STYLES) {
 
 function rebuildFromInputs(): void {
   const next = readInputs();
-  if (!next || !renderer) return;
+  if (!renderer) return;
+  if (!next) {
+    if (extensionActive) {
+      leaveExtension();
+      renderer.setModel(model, undefined);
+    }
+    return;
+  }
+  leaveExtension();
   model = next;
   model.roof = normalizedRoofType(model);
   updateDepthControl();
@@ -186,6 +210,7 @@ layoutSelect.addEventListener('change', () => {
 
 roofSelect.addEventListener('change', () => {
   if (!renderer || !isRoofType(roofSelect.value)) return;
+  leaveExtension();
   model = { ...model, roof: roofSelect.value };
   renderer.setModel(model, renderer.cameraState());
   announce(`${ROOF_TYPES.find((roof) => roof.id === model.roof)?.label} roof selected`);
@@ -193,6 +218,7 @@ roofSelect.addEventListener('change', () => {
 
 facadeSelect.addEventListener('change', () => {
   if (!renderer) return;
+  leaveExtension();
   const styleId = facadeSelect.value;
   model = {
     ...model,
@@ -225,6 +251,11 @@ element<HTMLButtonElement>('save-png').addEventListener('click', () => {
 
 element<HTMLButtonElement>('copy-link').addEventListener('click', async () => {
   try {
+    if (extensionActive) {
+      await navigator.clipboard.writeText(window.location.href);
+      announce('Link copied');
+      return;
+    }
     const state = renderer?.exampleState();
     const moduleState = state && !state.visible ? 0 : state?.withdrawn ? 1 : 2;
     await navigator.clipboard.writeText(
@@ -243,6 +274,7 @@ fileInput.addEventListener('change', async () => {
   if (!file || !renderer) return;
   try {
     const loaded = parseSketchXml(await file.text());
+    leaveExtension();
     model = loaded;
     writeInputs();
     renderer.setModel(model, model.camera);
@@ -256,6 +288,11 @@ fileInput.addEventListener('change', async () => {
 });
 
 try {
+  const extension = await extensionFromUrl(new URL(window.location.href));
+  if (extension) {
+    model = extension.model;
+    extensionActive = true;
+  }
   renderer = new SketchRenderer(canvas);
   renderer.onExampleChange = updateModuleControls;
   renderer.setModel(
@@ -263,8 +300,13 @@ try {
     undefined,
     false,
     false,
-    moduleStateFromUrl(new URL(window.location.href)),
+    extensionActive ? 0 : moduleStateFromUrl(new URL(window.location.href)),
   );
+  if (extension) {
+    renderer.setPresentation(extension.createPresentation());
+    greeting.textContent = extension.greeting;
+    greeting.hidden = false;
+  }
   writeInputs();
   updateFacts();
   announce(

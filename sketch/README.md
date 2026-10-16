@@ -41,3 +41,24 @@ The canvas fills its container without contributing an intrinsic layout size. It
 The renderer uses the provisional visual-study dimensions currently used by `exosett_cad`: a 2.798 m × 5.918 m × 3.487 m accommodation cell, a 1.6 m service-frame depth, and a 0.3 m inter-frame gap. These are Sketch defaults for an abstract model, not engineering requirements or a universal ExoSett specification. The module-size assumption is the ISO 668 1CCC envelope, and the initial view is one cell wide by one cell high with one illustrative module. Small shoes support its lower envelope corners without changing the reference module or frame dimensions. The example can be hidden or withdrawn and inserted; facades coexist with the example but block insertion and withdrawal. Facade selection is disabled during motion, and changing facades preserves the module position. Motion is user-triggered, stops after each movement, and respects reduced-motion preferences. The camera fits both endpoints before movement. Grid or layout changes return the single example to the first ground-floor cell. Shared links preserve the illustration state using `module=0` (hidden), `module=1` (withdrawn), or `module=2` (inserted). Older links default to inserted. Links copied during motion capture the destination. This remains presentation state, not a module placement in XML.
 
 Camera, layout controls, and facade-style state are saved in the Sketch application namespace. Each rendered pair and its placement are also written as core model data, allowing other applications to understand the arrangement while ignoring Sketch-specific state. The global facade selection is preserved when the grid dimensions change.
+
+### URL extensions
+
+Open Sketch with `?2026xmas` as its sole, empty-valued query parameter for the
+2026 Christmas scene: two frame pairs, three cells high, five wide, zero depth,
+brick windows and a gabled roof. Rotation, zoom, PNG download and ordinary model
+XML export remain available. The example module controls are disabled during
+the scene. Changing a building parameter or loading XML removes the presentation,
+restores ordinary rendering and removes the activation query. Copy link retains
+the seasonal URL while active.
+
+`src/extensions/index.ts` contains the small lazy-loader registry. To add another
+independent event, register a dynamic import under its URL key and return a
+`SketchExtension`: an ordinary model, greeting and presentation factory. The
+renderer attaches the presentation group separately from the building, fits the
+camera to its explicit bounds, and disposes it on the next model change. Exclude
+large background objects from those bounds. Presentations must own and release
+their geometry and materials; they must not mutate shared core resources. No
+extension scene code is fetched for ordinary, unknown or combined parameters.
+Remove an extension by deleting its registration and directory. There is no
+calendar activation or special long-term compatibility guarantee.

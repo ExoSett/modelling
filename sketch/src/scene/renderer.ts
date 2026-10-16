@@ -4,6 +4,7 @@ import type { ModuleState } from '../model/url';
 import type { CameraState, SketchModel } from '../model/model';
 import { buildBuilding, disposeBuilding } from './building';
 import { buildExampleModule, MODULE_TRAVEL } from './example-module';
+import type { SketchPresentation } from '../extensions';
 
 export class SketchRenderer {
   private readonly scene = new THREE.Scene();
@@ -13,6 +14,7 @@ export class SketchRenderer {
   private readonly resizeObserver: ResizeObserver;
   private readonly sun = new THREE.DirectionalLight(0xffffff, 3.2);
   private building?: THREE.Group;
+  private presentation?: SketchPresentation;
   private requestedFrame?: number;
   private viewMotion?: {
     start: number;
@@ -131,6 +133,7 @@ export class SketchRenderer {
     preserveExample = false,
     moduleState?: ModuleState,
   ): void {
+    this.clearPresentation();
     const retainedTarget = this.viewMotion?.toTarget.clone() ?? this.controls.target.clone();
     const previousCenter = this.building
       ? (this.demonstrationBounds ?? new THREE.Box3().setFromObject(this.building)).getCenter(
@@ -166,6 +169,24 @@ export class SketchRenderer {
     } else if (cameraState) this.setCameraState(cameraState);
     else this.resetView(!!previousCenter);
     this.onExampleChange?.();
+  }
+
+  setPresentation(presentation: SketchPresentation): void {
+    this.clearPresentation();
+    this.presentation = presentation;
+    this.scene.add(presentation.group);
+    this.demonstrationBounds = new THREE.Box3().setFromObject(this.building!);
+    this.demonstrationBounds.union(presentation.bounds);
+    this.fitShadowCamera();
+    this.resetView(false);
+  }
+
+  private clearPresentation(): void {
+    if (!this.presentation) return;
+    this.scene.remove(this.presentation.group);
+    this.presentation.dispose();
+    this.presentation = undefined;
+    this.demonstrationBounds = undefined;
   }
 
   private fitShadowCamera(): void {
