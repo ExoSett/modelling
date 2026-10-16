@@ -6,6 +6,10 @@ test('starts with one frame pair and demonstrates one module', async ({ page }) 
   await expect(page.locator('#model-size')).toHaveText('2.8 × 3.5 m');
   await expect(page.getByLabel('Frame pairs')).toHaveValue('single');
   await expect(page.locator('#show-module')).toBeChecked();
+  await expect(page.locator('#move-module')).toHaveText('Insert module');
+  await page.locator('#move-module').click();
+  await expect(page.locator('#move-module')).toHaveText('Inserting module…');
+  await expect(page.locator('#move-module')).toHaveText('Withdraw module');
   await page.locator('#move-module').click();
   await expect(page.locator('#move-module')).toHaveText('Withdrawing module…');
   await expect(page.locator('#move-module')).toHaveText('Insert module');
@@ -25,7 +29,7 @@ test('reduced motion changes endpoints immediately and rebuilds cancel movement'
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto('/');
+  await page.goto('/?module=2');
   await page.locator('#move-module').click();
   await expect(page.locator('#move-module')).toHaveText('Insert module');
   await page.locator('#cells-high').fill('2');

@@ -36,7 +36,7 @@ describe('Sketch URLs', () => {
       expect(moduleStateFromUrl(url)).toBe(state);
       expect(modelFromUrl(url)).toEqual(DEFAULT_MODEL);
     }
-    expect(moduleStateFromUrl(new URL('https://example.com/'))).toBe(2);
+    expect(moduleStateFromUrl(new URL('https://example.com/'))).toBe(1);
   });
 
   it('creates a canonical complete URL', () => {
@@ -48,7 +48,7 @@ describe('Sketch URLs', () => {
       roof: 'space-frame',
     });
     expect(url.href).toBe(
-      'https://example.com/sketch/?layout=2&h=2&w=9&d=5&roof=space-frame&accommodation_facade=none&module=2',
+      'https://example.com/sketch/?layout=2&h=2&w=9&d=5&roof=space-frame&accommodation_facade=none&module=1',
     );
   });
 });

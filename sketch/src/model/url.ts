@@ -11,7 +11,7 @@ export type ModuleState = 0 | 1 | 2;
 
 export function moduleStateFromUrl(url: URL): ModuleState {
   const value = url.searchParams.get('module');
-  return value === '0' ? 0 : value === '1' ? 1 : 2;
+  return value === '0' ? 0 : value === '2' ? 2 : 1;
 }
 
 const QUERY_KEYS = ['layout', 'h', 'w', 'd', 'roof', 'accommodation_facade'] as const;
@@ -61,7 +61,7 @@ export function modelFromUrl(url: URL): SketchModel {
   }
 }
 
-export function urlForModel(baseUrl: URL, model: SketchModel, moduleState: ModuleState = 2): URL {
+export function urlForModel(baseUrl: URL, model: SketchModel, moduleState: ModuleState = 1): URL {
   const url = new URL(baseUrl);
   url.search = '';
   url.hash = '';
