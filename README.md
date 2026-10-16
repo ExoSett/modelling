@@ -45,3 +45,5 @@ These licences do **not** require XML models merely expressed using this format 
 ## ExoSett Sketch
 
 Sketch is a framework-free TypeScript and Three.js application that runs entirely in the browser. Development and verification commands are documented in [`sketch/README.md`](sketch/README.md).
+
+Release requirements for the combined website are in [docs/releasing-sketch.md](docs/releasing-sketch.md).
