@@ -15,7 +15,7 @@ test('Christmas is lazy, viewable, export-safe and exits on a parameter change',
   await expect(page.locator('#building-layout')).toHaveValue('double');
   await expect(page.locator('#roof-type')).toHaveValue('gable');
   await expect(page.locator('#show-module')).toBeDisabled();
-  await page.screenshot({ path: `/private/tmp/exosett-xmas-${test.info().project.name}.png` });
+  await page.screenshot({ path: test.info().outputPath('exosett-xmas.png') });
   const downloadPromise = page.waitForEvent('download');
   await page.locator('#save-xml').click();
   const stream = await (await downloadPromise).createReadStream();
