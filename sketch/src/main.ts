@@ -204,7 +204,12 @@ depthInput.addEventListener('input', () => rebuildFromInputs());
 layoutSelect.addEventListener('change', () => {
   if (!isBuildingLayout(layoutSelect.value)) return;
   updateDepthControl(layoutSelect.value);
-  depthInput.value = layoutSelect.value === 'quadrangle' ? '1' : '0';
+  depthInput.value =
+    layoutSelect.value === 'single'
+      ? '0'
+      : String(
+          Math.min(Number(depthInput.max), Math.max(Number(depthInput.min), model.depth ?? 0)),
+        );
   rebuildFromInputs();
 });
 

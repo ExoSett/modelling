@@ -51,3 +51,30 @@ test('published seasonal chunks load and initialize', async ({ page }) => {
   await expect(page.locator('#roof-type')).toHaveValue('gable');
   await expect(page.locator('#webgl-error')).toBeHidden();
 });
+
+test('layout switches preserve depth and clamp only to the new limits', async ({ page }) => {
+  await page.goto('/design/sketch/?layout=2&h=2&w=3&d=4&roof=none&accommodation_facade=none');
+  const layout = page.locator('#building-layout');
+  const depth = page.locator('#depth');
+  for (const [value, label] of [
+    ['quadrangle', 'Four pairs'],
+    ['double', 'Two pairs'],
+  ]) {
+    await layout.selectOption(value!);
+    await expect(depth).toHaveValue('4');
+    await expect(page.locator('#status')).toHaveText(`${label}: 2 high × 3 wide × 4 deep`);
+  }
+  await layout.selectOption('quadrangle');
+  await depth.fill('20');
+  await layout.selectOption('double');
+  await expect(depth).toHaveValue('5');
+  await expect(page.locator('#status')).toHaveText('Two pairs: 2 high × 3 wide × 5 deep');
+  await depth.fill('0');
+  await layout.selectOption('quadrangle');
+  await expect(depth).toHaveValue('1');
+  await expect(page.locator('#status')).toHaveText('Four pairs: 2 high × 3 wide × 1 deep');
+  await layout.selectOption('single');
+  await expect(depth).toHaveValue('0');
+  await expect(page.locator('#depth-control')).toBeHidden();
+  await expect(page.locator('#status')).toHaveText('One pair: 2 high × 3 wide');
+});

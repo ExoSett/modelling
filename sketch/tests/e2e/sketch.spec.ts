@@ -124,9 +124,9 @@ test('switches between facing-pair and quadrangle layouts', async ({ page }) => 
 
   await layout.selectOption('quadrangle');
   await expect(depthControl).toBeVisible();
-  await expect(page.locator('#depth')).toHaveValue('1');
+  await expect(page.locator('#depth')).toHaveValue('5');
   await expect(page.locator('#depth')).toHaveAttribute('max', '20');
-  await expect(page.locator('#status')).toHaveText('Four pairs: 3 high × 5 wide × 1 deep');
+  await expect(page.locator('#status')).toHaveText('Four pairs: 3 high × 5 wide × 5 deep');
 
   await layout.selectOption('single');
   await expect(depthControl).toBeHidden();
