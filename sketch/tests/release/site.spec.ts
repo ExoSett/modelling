@@ -24,12 +24,12 @@ test('published Sketch initializes, renders, moves and exports', async ({ page }
   await expect(page.locator('#building-layout')).toHaveValue('single');
   await expect(page.locator('#roof-type option')).toHaveCount(4);
   await expect(page.locator('#facade-style option')).toHaveCount(4);
-  await expect(page.locator('#move-module')).toHaveText('Insert module');
+  await expect(page.locator('#move-module')).toHaveText('Insert pod');
   await expect(page.locator('#webgl-error')).toBeHidden();
   const canvas = page.locator('#viewport');
   const before = await canvas.evaluate((node: HTMLCanvasElement) => node.toDataURL());
   await page.locator('#move-module').click();
-  await expect(page.locator('#move-module')).toHaveText('Withdraw module');
+  await expect(page.locator('#move-module')).toHaveText('Withdraw pod');
   await expect
     .poll(() => canvas.evaluate((node: HTMLCanvasElement) => node.toDataURL()))
     .not.toBe(before);

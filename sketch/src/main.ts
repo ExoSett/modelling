@@ -68,14 +68,14 @@ function updateModuleControls(): void {
   moveModule.disabled = extensionActive || !state?.visible || state.moving || !!model.facade;
   moveModule.textContent = state?.moving
     ? state.withdrawn
-      ? 'Withdrawing module…'
-      : 'Inserting module…'
+      ? 'Withdrawing pod…'
+      : 'Inserting pod…'
     : state?.withdrawn
-      ? 'Insert module'
-      : 'Withdraw module';
+      ? 'Insert pod'
+      : 'Withdraw pod';
   moduleHelp.textContent = model.facade
-    ? 'Remove facades to move the example module.'
-    : 'One illustrative 1CCC module; not a placed module in saved XML.';
+    ? 'Remove facades to move the example pod.'
+    : 'One illustrative 1CCC accommodation pod; not a placed pod in saved XML.';
 }
 showModule.addEventListener('change', () => renderer?.showModule(showModule.checked));
 moveModule.addEventListener('click', () => renderer?.moveModule());

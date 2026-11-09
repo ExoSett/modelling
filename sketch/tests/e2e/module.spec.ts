@@ -6,15 +6,15 @@ test('starts with one frame pair and demonstrates one module', async ({ page }) 
   await expect(page.locator('#model-size')).toHaveText('2.8 × 3.5 m');
   await expect(page.getByLabel('Frame pairs')).toHaveValue('single');
   await expect(page.locator('#show-module')).toBeChecked();
-  await expect(page.locator('#move-module')).toHaveText('Insert module');
+  await expect(page.locator('#move-module')).toHaveText('Insert pod');
   await page.locator('#move-module').click();
-  await expect(page.locator('#move-module')).toHaveText('Inserting module…');
-  await expect(page.locator('#move-module')).toHaveText('Withdraw module');
+  await expect(page.locator('#move-module')).toHaveText('Inserting pod…');
+  await expect(page.locator('#move-module')).toHaveText('Withdraw pod');
   await page.locator('#move-module').click();
-  await expect(page.locator('#move-module')).toHaveText('Withdrawing module…');
-  await expect(page.locator('#move-module')).toHaveText('Insert module');
+  await expect(page.locator('#move-module')).toHaveText('Withdrawing pod…');
+  await expect(page.locator('#move-module')).toHaveText('Insert pod');
   await page.locator('#move-module').click();
-  await expect(page.locator('#move-module')).toHaveText('Withdraw module');
+  await expect(page.locator('#move-module')).toHaveText('Withdraw pod');
   await page.locator('#facade-style').selectOption('brick-window');
   await expect(page.locator('#move-module')).toBeDisabled();
   await expect(page.locator('#show-module')).toBeChecked();
@@ -31,21 +31,21 @@ test('reduced motion changes endpoints immediately and rebuilds cancel movement'
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/?module=2');
   await page.locator('#move-module').click();
-  await expect(page.locator('#move-module')).toHaveText('Insert module');
+  await expect(page.locator('#move-module')).toHaveText('Insert pod');
   await page.locator('#cells-high').fill('2');
-  await expect(page.locator('#move-module')).toHaveText('Withdraw module');
+  await expect(page.locator('#move-module')).toHaveText('Withdraw pod');
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.locator('#move-module').click();
   await expect(page.locator('#facade-style')).toBeDisabled();
-  await expect(page.locator('#move-module')).toHaveText('Insert module');
+  await expect(page.locator('#move-module')).toHaveText('Insert pod');
   await page.locator('#facade-style').selectOption('stone-bars');
   await expect(page.locator('#move-module')).toBeDisabled();
-  await expect(page.locator('#move-module')).toHaveText('Insert module');
+  await expect(page.locator('#move-module')).toHaveText('Insert pod');
   await page.locator('#show-module').uncheck();
   await page.locator('#show-module').check();
-  await expect(page.locator('#move-module')).toHaveText('Insert module');
+  await expect(page.locator('#move-module')).toHaveText('Insert pod');
   await page.locator('#facade-style').selectOption('');
-  await expect(page.locator('#move-module')).toHaveText('Insert module');
+  await expect(page.locator('#move-module')).toHaveText('Insert pod');
   await expect(page.locator('#move-module')).toBeEnabled();
 });
 
@@ -65,7 +65,7 @@ test('shared links restore each module state and copy the movement destination',
     await expect(page.locator('#cells-wide')).toHaveValue('3');
     await expect(page.locator('#show-module')).toBeChecked({ checked: state !== 0 });
     await expect(page.locator('#move-module')).toHaveText(
-      state === 1 ? 'Insert module' : 'Withdraw module',
+      state === 1 ? 'Insert pod' : 'Withdraw pod',
     );
     await page.locator('#copy-link').click();
     await expect(page.locator('html')).toHaveAttribute(
@@ -74,7 +74,7 @@ test('shared links restore each module state and copy the movement destination',
     );
   }
   await page.locator('#move-module').click();
-  await expect(page.locator('#move-module')).toHaveText('Withdrawing module…');
+  await expect(page.locator('#move-module')).toHaveText('Withdrawing pod…');
   await page.locator('#copy-link').click();
   await expect(page.locator('html')).toHaveAttribute('data-copied-link', /module=1$/);
 });
