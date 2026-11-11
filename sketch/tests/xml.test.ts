@@ -96,10 +96,10 @@ describe('Sketch XML', () => {
   it('rejects unsupported model shapes', () => {
     const xml = createSketchXml({ cellsWide: 5, cellsHigh: 3 }, camera);
     expect(() => parseSketchXml(xml.replace('depthCells="1"', 'depthCells="2"'))).toThrow(
-      'depth of one cell',
+      'depth of one bay',
     );
     expect(() => parseSketchXml(xml.replace('widthCells="5"', 'widthCells="21"'))).toThrow(
-      'Cells wide',
+      'Bays wide',
     );
     expect(() =>
       parseSketchXml(xml.replace('formatVersion="1.0.0"', 'formatVersion="2.0.0"')),

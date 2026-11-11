@@ -117,7 +117,7 @@ function updateDepthControl(layout = model.layout ?? 'single'): void {
   depthRange.textContent = `${minimum}–${maximum}`;
   depthHelp.textContent =
     layout === 'quadrangle'
-      ? 'Sets the width of each side frame pair in cells.'
+      ? 'Sets the width of each side frame pair in bays.'
       : 'At zero, the two accommodation frames share one service frame.';
 }
 
@@ -232,7 +232,7 @@ facadeSelect.addEventListener('change', () => {
   renderer.setModel(model, renderer.cameraState(), false, true);
   announce(
     model.facade
-      ? `${FACADE_STYLES.find((style) => style.id === model.facade?.styleId)?.label} on all cells`
+      ? `${FACADE_STYLES.find((style) => style.id === model.facade?.styleId)?.label} on all bays`
       : 'Façades removed',
   );
 });

@@ -15,8 +15,8 @@ describe('model validation', () => {
   });
 
   it('rejects values outside the supported range', () => {
-    expect(() => validateModel({ cellsWide: 0, cellsHigh: 3 })).toThrow('Cells wide');
-    expect(() => validateModel({ cellsWide: 5, cellsHigh: 11 })).toThrow('Cells high');
+    expect(() => validateModel({ cellsWide: 0, cellsHigh: 3 })).toThrow('Bays wide');
+    expect(() => validateModel({ cellsWide: 5, cellsHigh: 11 })).toThrow('Bays high');
     expect(() => validateModel({ cellsWide: 2.5, cellsHigh: 3 })).toThrow('whole number');
   });
 

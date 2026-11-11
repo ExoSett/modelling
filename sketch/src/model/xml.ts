@@ -119,19 +119,19 @@ export function parseSketchXml(xml: string): SketchModel {
 
   const grid = requiredElement(framePairs[0]!, MODEL_NAMESPACE, 'grid');
   const depth = requiredNumber(grid, 'depthCells');
-  if (depth !== 1) throw new Error('This version of Sketch supports a frame depth of one cell.');
+  if (depth !== 1) throw new Error('This version of Sketch supports a frame depth of one bay.');
 
   const cellsWide = validateCellCount(
     requiredNumber(grid, 'widthCells'),
     LIMITS.minWide,
     LIMITS.maxWide,
-    'Cells wide',
+    'Bays wide',
   );
   const cellsHigh = validateCellCount(
     requiredNumber(grid, 'heightCells'),
     LIMITS.minHigh,
     LIMITS.maxHigh,
-    'Cells high',
+    'Bays high',
   );
   for (const [index, framePair] of Array.from(framePairs).entries()) {
     const pairGrid = requiredElement(framePair, MODEL_NAMESPACE, 'grid');
@@ -241,8 +241,7 @@ function documentForModel(model: SketchModel, camera: CameraState): XMLDocument 
   moduleType.setAttribute('id', 'iso-1ccc');
   moduleType.setAttribute('name', 'ISO 668 1CCC 20-foot high-cube envelope');
   const description = document.createElementNS(MODEL_NAMESPACE, 'description');
-  description.textContent =
-    'Sketch v0.1 module-size assumption; no modules are placed in this model.';
+  description.textContent = 'Sketch v0.1 reference pod size; no pods are placed in this model.';
   const dimensions = document.createElementNS(MODEL_NAMESPACE, 'dimensions');
   for (const [name, value] of Object.entries(DIMENSIONS_METRES.module1CCC)) {
     dimensions.setAttribute(name, String(value));

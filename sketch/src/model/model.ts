@@ -125,8 +125,8 @@ export function validateModel(model: SketchModel): SketchModel {
   const depth = validateCellCount(model.depth ?? defaultDepth, minimumDepth, maximumDepth, 'Depth');
   return {
     ...model,
-    cellsWide: validateCellCount(model.cellsWide, LIMITS.minWide, LIMITS.maxWide, 'Cells wide'),
-    cellsHigh: validateCellCount(model.cellsHigh, LIMITS.minHigh, LIMITS.maxHigh, 'Cells high'),
+    cellsWide: validateCellCount(model.cellsWide, LIMITS.minWide, LIMITS.maxWide, 'Bays wide'),
+    cellsHigh: validateCellCount(model.cellsHigh, LIMITS.minHigh, LIMITS.maxHigh, 'Bays high'),
     layout,
     depth,
     roof: normalizedRoofType({ ...model, layout, depth }),
