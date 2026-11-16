@@ -6,6 +6,9 @@ This role is distinct from the sibling `ExoSett/website` repository: the website
 
 ## Contents
 
+- [`docs/information-model.md`](docs/information-model.md) — proposed three-document architecture, review findings and next steps
+- [`docs/information-model-examples.md`](docs/information-model-examples.md) — illustrative snapshots and scenarios, not schema-valid XML
+- [`docs/information-model-standards.md`](docs/information-model-standards.md) — standards alignment and questions for further investigation
 - [`docs/format.md`](docs/format.md) — scope and design of the building specification format
 - [`docs/versioning.md`](docs/versioning.md) — schema and building specification versioning policy
 - [`schema/exosett-model-1.0.0.xsd`](schema/exosett-model-1.0.0.xsd) — current XML Schema
@@ -13,6 +16,11 @@ This role is distinct from the sibling `ExoSett/website` repository: the website
 - [`sketch/README.md`](sketch/README.md) — lightweight static ExoSett Sketch application
 
 The current schema is deliberately limited. It can describe multiple placed frame pairs, abstract module types, and module placements. It is expected to evolve through practical use and feedback rather than attempt to define every area in advance. Validation against it does not certify structural soundness, manufacturability, regulatory compliance, or fitness for any purpose.
+
+The proposed information architecture is a documentation-stage evolution of this
+format. It does not change version 1.0.0, reinterpret existing XML as physical
+asset records, or implement imports or new document categories. Schema changes
+will follow a separate review of the architecture and worked examples.
 
 ## Building specification lifecycle
 
