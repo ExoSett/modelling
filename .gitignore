@@ -5,3 +5,5 @@ sketch/coverage/
 sketch/test-results/
 sketch/playwright-report/
 .DS_Store
+__pycache__/
+test-results/

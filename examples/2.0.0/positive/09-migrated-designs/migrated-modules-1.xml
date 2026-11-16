@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8'?>
+<buildingClass xmlns="https://www.exosett.com/xml/model" id="https://example.invalid/exosett/migrated-modules" revision="1" formatVersion="2.0.0" scope="arrangement">
+  <metadata recorded="2026-11-01T12:00:00Z" author="https://example.invalid/exosett/people/checker" observed="2026-10-01">
+    <change>Fictional worked example: migrated-modules revision 1</change>
+    <evidence artifact="https://example.invalid/exosett/evidence/work-record" subject="$document" role="illustrative-work-and-inspection" />
+    <evidence artifact="https://example.invalid/exosett/source/modules.xml" subject="$document" role="source-1.0.0-document" />
+  </metadata>
+  <purpose>Design-only migration of modules.xml; original IDs retained, no physical assets inferred</purpose>
+  <definition id="example-module" kind="accommodation-module">
+    <description>Example module: An abstract example envelope, not a prescribed ExoSett size.</description>
+    <dimensions width="6.0" height="2.9" depth="3.0" unit="m" />
+  </definition>
+  <position id="module-1" kind="installation" designation="module-1">
+    <use local="example-module" />
+  </position>
+  <position id="module-2" kind="installation" designation="module-2">
+    <use local="example-module" />
+  </position>
+  <position id="module-3" kind="installation" designation="module-3">
+    <use local="example-module" />
+  </position>
+  <framePair id="pair-1">
+    <placement x="0" y="0" z="0" unit="m" rotation="0" />
+    <grid widthCells="2" heightCells="2" depthCells="1" />
+    <accommodationFrame id="accommodation-frame-1">
+      <cellDimensions width="6.2" height="3.1" depth="3.2" unit="m" />
+    </accommodationFrame>
+    <serviceFrame id="service-frame-1">
+      <cellDimensions width="6.2" height="3.1" depth="1.8" unit="m" />
+    </serviceFrame>
+  </framePair>
+  <cell position="module-1" pair="pair-1" frame="accommodation-frame-1" x="0" y="0" z="0" />
+  <cell position="module-2" pair="pair-1" frame="accommodation-frame-1" x="1" y="0" z="0" />
+  <cell position="module-3" pair="pair-1" frame="accommodation-frame-1" x="0" y="0" z="1" />
+</buildingClass>

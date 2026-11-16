@@ -1,7 +1,10 @@
 # Bounded 2.0.0 implementation plan
 
-Status: proposal for review, 16 November 2026. **No schema implementation is
-authorized by this document.** The current implemented format remains 1.0.0.
+Status: retained implementation plan, 16 November 2026. Implementation was
+subsequently authorized and the bounded prototype is now available. This document
+preserves the planning recommendations; the [prototype contract](format-2.0.0.md)
+and [findings](prototype-2.0.0-findings.md) record actual choices and deviations.
+The review checkpoints below describe the original plan, not a new authorization.
 This plan translates the [architecture](information-model.md) and
 [seven examples](information-model-examples.md) into a limited first release.
 

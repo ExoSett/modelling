@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<p:publicationSet xmlns="https://www.exosett.com/xml/model" xmlns:p="https://www.exosett.com/xml/publication" id="https://example.invalid/exosett/Correction" revision="1" formatVersion="2.0.0" status="accepted" operation="correction">
+  <p:metadata recorded="2026-11-01T12:00:00Z" author="https://example.invalid/exosett/people/checker" effective="2026-10-01" observed="2026-10-01">
+    <change>Fictional worked example: Correction revision 1</change>
+    <evidence artifact="https://example.invalid/exosett/evidence/work-record" subject="$document" role="illustrative-work-and-inspection" />
+  </p:metadata>
+  <p:baseline document="https://example.invalid/exosett/Original" revision="1" />
+  <p:result document="https://example.invalid/exosett/X" revision="2" />
+  <p:result document="https://example.invalid/exosett/C" revision="2" />
+  <p:result document="https://example.invalid/exosett/D" revision="2" />
+</p:publicationSet>

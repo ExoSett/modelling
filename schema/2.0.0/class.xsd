@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:m="https://www.exosett.com/xml/model" targetNamespace="https://www.exosett.com/xml/model" elementFormDefault="qualified" version="2.0.0">
+  <xs:complexType name="Definition">
+    <xs:sequence>
+      <xs:element name="description" type="m:Text" minOccurs="0"/>
+      <xs:element name="dimensions" type="m:Dimensions" minOccurs="0"/>
+      <xs:element name="maxSpan" type="m:Length" minOccurs="0"/>
+      <xs:element name="use" type="m:Use" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:ID" use="required"/>
+    <xs:attribute name="kind" type="m:Text" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="Position">
+    <xs:sequence>
+      <xs:element name="predecessor" type="m:Local" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="use" type="m:Use" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="requiredSpan" type="m:Length" minOccurs="0"/>
+      <xs:element name="placement" minOccurs="0">
+        <xs:complexType>
+          <xs:attribute name="x" type="xs:decimal" use="required"/>
+          <xs:attribute name="y" type="xs:decimal" use="required"/>
+          <xs:attribute name="z" type="xs:decimal" use="required"/>
+          <xs:attribute name="unit" type="m:Unit" use="required"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="member" type="m:Local" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:ID" use="required"/>
+    <xs:attribute name="designation" type="m:Text" use="required"/>
+    <xs:attribute name="designationScheme" type="xs:anyURI"/>
+    <xs:attribute name="designationContext" type="m:Text"/>
+    <xs:attribute name="kind" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="group"/>
+          <xs:enumeration value="installation"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="continuity">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="unchanged"/>
+          <xs:enumeration value="renamed"/>
+          <xs:enumeration value="modified"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="Frame">
+    <xs:sequence>
+      <xs:element name="cellDimensions" type="m:Dimensions"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:ID" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="FramePair">
+    <xs:sequence>
+      <xs:element name="placement">
+        <xs:complexType>
+          <xs:attribute name="x" type="xs:decimal" use="required"/>
+          <xs:attribute name="y" type="xs:decimal" use="required"/>
+          <xs:attribute name="z" type="xs:decimal" use="required"/>
+          <xs:attribute name="unit" type="m:Unit" use="required"/>
+          <xs:attribute name="rotation" use="required">
+            <xs:simpleType>
+              <xs:restriction base="xs:integer">
+                <xs:enumeration value="0"/>
+                <xs:enumeration value="90"/>
+                <xs:enumeration value="180"/>
+                <xs:enumeration value="270"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="grid">
+        <xs:complexType>
+          <xs:attribute name="widthCells" type="xs:positiveInteger" use="required"/>
+          <xs:attribute name="heightCells" type="xs:positiveInteger" use="required"/>
+          <xs:attribute name="depthCells" type="xs:positiveInteger" use="required"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="accommodationFrame" type="m:Frame"/>
+      <xs:element name="serviceFrame" type="m:Frame"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:ID" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="Cell">
+    <xs:attribute name="position" type="xs:NCName" use="required"/>
+    <xs:attribute name="pair" type="xs:NCName" use="required"/>
+    <xs:attribute name="frame" type="xs:NCName" use="required"/>
+    <xs:attribute name="x" type="xs:nonNegativeInteger" use="required"/>
+    <xs:attribute name="y" type="xs:nonNegativeInteger" use="required"/>
+    <xs:attribute name="z" type="xs:nonNegativeInteger" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="Class">
+    <xs:sequence>
+      <xs:element name="metadata" type="m:Metadata"/>
+      <xs:element name="purpose" type="m:Text"/>
+      <xs:element name="import" type="m:Import" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="definition" type="m:Definition" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="position" type="m:Position" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="retired" type="m:Local" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="framePair" type="m:FramePair" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="cell" type="m:Cell" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="m:Identity"/>
+    <xs:attribute name="scope" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="definitions-only"/>
+          <xs:enumeration value="arrangement"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+</xs:schema>

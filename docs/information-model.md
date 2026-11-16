@@ -1,8 +1,9 @@
 # ExoSett information-model architecture
 
-Status: proposed foundation for review, 16 November 2026. This document describes
-the next direction, not the implemented XML contract. The existing
-[format](format.md), schema version 1.0.0 and examples remain unchanged.
+Status: architectural foundation, 16 November 2026. The bounded
+[2.0.0 prototype](format-2.0.0.md) now exercises this direction; this conceptual
+document is broader than its initial engineering vocabulary. The existing
+[1.0.0 format](format.md), schema and examples remain unchanged.
 
 The aim is to distinguish reusable engineering definitions from records of
 physical buildings and components. This is an evolutionary step, not a complete
@@ -242,6 +243,7 @@ a scenario exceeds the initial supported scope.
 6. Adapt tool import/export boundaries only as a separately scoped change, following
    the existing release requirements if Sketch or website integration is affected.
 
-The [2.0.0 implementation plan](implementation-plan-2.0.0.md) now proposes concrete
-representations and a bounded sequence for these decisions. Stop at that review
-checkpoint before implementing schemas.
+The [2.0.0 implementation plan](implementation-plan-2.0.0.md) records the approved
+bounded direction. See [implementation findings](prototype-2.0.0-findings.md) for
+the choices made and remaining questions. The current checkpoint is review of the
+working prototype, not authorization to expand its scope.

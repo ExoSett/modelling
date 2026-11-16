@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:m="https://www.exosett.com/xml/model" targetNamespace="https://www.exosett.com/xml/model" elementFormDefault="qualified" version="2.0.0">
+  <xs:simpleType name="Text">
+    <xs:restriction base="xs:token">
+      <xs:minLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Positive">
+    <xs:restriction base="xs:decimal">
+      <xs:minExclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Unit">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="mm"/>
+      <xs:enumeration value="cm"/>
+      <xs:enumeration value="m"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Time">
+    <xs:union memberTypes="xs:date xs:dateTime"/>
+  </xs:simpleType>
+  <xs:simpleType name="Effective">
+    <xs:union memberTypes="m:Time">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="unknown"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+  <xs:attributeGroup name="Identity">
+    <xs:attribute name="id" type="xs:anyURI" use="required"/>
+    <xs:attribute name="revision" type="m:Text" use="required"/>
+    <xs:attribute name="formatVersion" type="xs:string" fixed="2.0.0" use="required"/>
+  </xs:attributeGroup>
+  <xs:complexType name="Ref">
+    <xs:attribute name="document" type="xs:anyURI" use="required"/>
+    <xs:attribute name="revision" type="m:Text" use="required"/>
+    <xs:attribute name="target" type="xs:NCName"/>
+  </xs:complexType>
+  <xs:complexType name="Import">
+    <xs:complexContent>
+      <xs:extension base="m:Ref">
+        <xs:attribute name="alias" type="xs:NCName" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="Local">
+    <xs:attribute name="target" type="xs:NCName" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="Use">
+    <xs:attribute name="local" type="xs:NCName"/>
+    <xs:attribute name="import" type="xs:NCName"/>
+  </xs:complexType>
+  <xs:complexType name="Evidence">
+    <xs:attribute name="artifact" type="xs:anyURI" use="required"/>
+    <xs:attribute name="subject" type="m:Text" use="required"/>
+    <xs:attribute name="role" type="m:Text" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="Correction">
+    <xs:complexContent>
+      <xs:extension base="m:Ref">
+        <xs:attribute name="reason" type="m:Text" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="Metadata">
+    <xs:sequence>
+      <xs:element name="change" type="m:Text"/>
+      <xs:element name="previous" type="m:Ref" minOccurs="0"/>
+      <xs:element name="evidence" type="m:Evidence" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="correction" type="m:Correction" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="recorded" type="xs:dateTime" use="required"/>
+    <xs:attribute name="author" type="xs:anyURI" use="required"/>
+    <xs:attribute name="effective" type="m:Effective"/>
+    <xs:attribute name="observed" type="m:Time"/>
+  </xs:complexType>
+  <xs:complexType name="Dimensions">
+    <xs:attribute name="width" type="m:Positive" use="required"/>
+    <xs:attribute name="height" type="m:Positive" use="required"/>
+    <xs:attribute name="depth" type="m:Positive" use="required"/>
+    <xs:attribute name="unit" type="m:Unit" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="Length">
+    <xs:attribute name="value" type="m:Positive" use="required"/>
+    <xs:attribute name="unit" type="m:Unit" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="Location">
+    <xs:attribute name="building" type="xs:anyURI" use="required"/>
+    <xs:attribute name="position" type="xs:NCName" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="Assessment">
+    <xs:sequence>
+      <xs:element name="deviation" type="m:Text" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="status" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="not-assessed"/>
+          <xs:enumeration value="recorded-conforming"/>
+          <xs:enumeration value="recorded-deviations"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+</xs:schema>

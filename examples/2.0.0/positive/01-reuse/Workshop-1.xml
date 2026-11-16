@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<buildingClass xmlns="https://www.exosett.com/xml/model" id="https://example.invalid/exosett/Workshop" revision="1" formatVersion="2.0.0" scope="arrangement">
+  <metadata recorded="2026-11-01T12:00:00Z" author="https://example.invalid/exosett/people/checker" observed="2026-10-01">
+    <change>Fictional worked example: Workshop revision 1</change>
+    <evidence artifact="https://example.invalid/exosett/evidence/work-record" subject="$document" role="illustrative-work-and-inspection" />
+  </metadata>
+  <purpose>Illustrative pod/beam installation arrangement; structural inventory omitted</purpose>
+  <import document="https://example.invalid/exosett/BeamLibrary" revision="5" target="beam" alias="standard" />
+  <position id="p-1" kind="installation" designation="Bay 1">
+    <use import="standard" />
+  </position>
+</buildingClass>

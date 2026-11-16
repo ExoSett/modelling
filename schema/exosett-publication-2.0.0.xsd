@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:p="https://www.exosett.com/xml/publication" xmlns:m="https://www.exosett.com/xml/model" targetNamespace="https://www.exosett.com/xml/publication" elementFormDefault="qualified" version="2.0.0">
+  <xs:import namespace="https://www.exosett.com/xml/model" schemaLocation="exosett-model-2.0.0.xsd"/>
+  <xs:element name="publicationSet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="metadata" type="m:Metadata"/>
+        <xs:element name="baseline" type="m:Ref" minOccurs="0"/>
+        <xs:element name="result" type="m:Ref" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="m:Identity"/>
+      <xs:attribute name="status" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="prepared"/>
+            <xs:enumeration value="accepted"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="operation" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="initial"/>
+            <xs:enumeration value="change"/>
+            <xs:enumeration value="correction"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

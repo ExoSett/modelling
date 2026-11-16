@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<catalogue version="1">
+  <artifact id="https://example.invalid/exosett/evidence/work-record" path="work-record.txt" sha256="53b45ad3d018b84657270e129cf8b1fa53c1498ccc6ee9d85269edaad9e8bc45" />
+  <artifact id="https://example.invalid/exosett/source/minimal.xml" path="source-minimal.xml" sha256="59c63a0ab1dfec3ef4e67410964585adf2d5d3fc1ef76170e84d85be575d5be2" />
+  <document id="https://example.invalid/exosett/migrated-minimal" revision="1" path="migrated-minimal-1.xml" sha256="284238ae3fa47f202d10941897889b2f05fd0a823e24fe62ed02f3007836cbf4" />
+  <artifact id="https://example.invalid/exosett/source/modules.xml" path="source-modules.xml" sha256="2ff2673dc853e1862c9924c679666b4addebba2b84f3716d542faddadcd688e5" />
+  <document id="https://example.invalid/exosett/migrated-modules" revision="1" path="migrated-modules-1.xml" sha256="c48208fd192dda5531a7b5353351fa83d3233b30d1e3a435773d4a1e24064276" />
+  <artifact id="https://example.invalid/exosett/source/two-frame-pairs.xml" path="source-two-frame-pairs.xml" sha256="804a8d2d55d5beb5e316e17e9c03169dd2146894c2ca070c7c986c95fae14e33" />
+  <document id="https://example.invalid/exosett/migrated-two-frame-pairs" revision="1" path="migrated-two-frame-pairs-1.xml" sha256="1a12388bfaefc1a6c102eb75a4601791c8c818c1c4daab13a5c6b571956c51e7" />
+</catalogue>

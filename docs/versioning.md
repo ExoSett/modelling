@@ -1,5 +1,19 @@
 # Schema and building specification versioning
 
+## Experimental 2.0.0 candidate
+
+The [2.0.0 prototype](format-2.0.0.md) is a major-format candidate because it changes
+document meaning and relationships. It retains the modelling namespace, introduces
+distinct roots and explicitly declares `formatVersion="2.0.0"`. It does not change
+the 1.0.0 schema or silently migrate its documents. The supporting publication
+format also declares its version in its own namespace.
+
+This candidate is not yet a stable release: review may revise it before release.
+Checked-in fictional fixtures are development artefacts, not issued project
+records. Issued project revisions are immutable; the prototype's catalogue checks
+content digests but cannot guarantee retention or detect coordinated tampering
+with both files and catalogue. The policies below remain applicable to releases.
+
 ## Schema versions
 
 The ExoSett schema follows [Semantic Versioning](https://semver.org/). Schema releases have a three-part version number: `major.minor.patch`. No particular version number, including `1.0.0`, represents a complete or final schema.

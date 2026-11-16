@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+<buildingInstance xmlns="https://www.exosett.com/xml/model" id="https://example.invalid/exosett/E" revision="2" formatVersion="2.0.0" building="https://example.invalid/exosett/physical-building-E">
+  <metadata recorded="2026-11-01T12:00:00Z" author="https://example.invalid/exosett/people/checker" effective="2026-10-15" observed="2026-10-15">
+    <change>Fictional worked example: E revision 2</change>
+    <previous document="https://example.invalid/exosett/E" revision="1" />
+    <evidence artifact="https://example.invalid/exosett/evidence/work-record" subject="$document" role="illustrative-work-and-inspection" />
+  </metadata>
+  <design document="https://example.invalid/exosett/Expandable" revision="2" />
+  <assessment status="not-assessed" />
+  <position id="e-1" state="occupied" continuity="unchanged">
+    <predecessor target="e-1" />
+    <design document="https://example.invalid/exosett/Expandable" revision="2" target="p-1" />
+    <component document="https://example.invalid/exosett/E1" revision="1" />
+  </position>
+  <position id="e-2" state="occupied" continuity="unchanged">
+    <predecessor target="e-2" />
+    <design document="https://example.invalid/exosett/Expandable" revision="2" target="p-2" />
+    <component document="https://example.invalid/exosett/E2" revision="1" />
+  </position>
+  <position id="e-3" state="occupied" continuity="unchanged">
+    <predecessor target="e-3" />
+    <design document="https://example.invalid/exosett/Expandable" revision="2" target="p-3" />
+    <component document="https://example.invalid/exosett/E3" revision="1" />
+  </position>
+  <position id="e-4" state="occupied">
+    <design document="https://example.invalid/exosett/Expandable" revision="2" target="p-4" />
+    <component document="https://example.invalid/exosett/E4" revision="2" />
+  </position>
+  <position id="e-5" state="occupied">
+    <design document="https://example.invalid/exosett/Expandable" revision="2" target="p-5" />
+    <component document="https://example.invalid/exosett/E5" revision="2" />
+  </position>
+</buildingInstance>

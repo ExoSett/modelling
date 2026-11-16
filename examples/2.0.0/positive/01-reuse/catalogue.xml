@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<catalogue version="1">
+  <artifact id="https://example.invalid/exosett/evidence/work-record" path="work-record.txt" sha256="53b45ad3d018b84657270e129cf8b1fa53c1498ccc6ee9d85269edaad9e8bc45" />
+  <document id="https://example.invalid/exosett/InterfaceLibrary" revision="2" path="InterfaceLibrary-2.xml" sha256="53322339e5b200c2c542e1e565c1be214d96f83e9263c0bd509c0acf2c8ffe7f" />
+  <document id="https://example.invalid/exosett/BeamLibrary" revision="5" path="BeamLibrary-5.xml" sha256="9a7efe2f4dc9610843d30f2dfe344aecdb7f74b54147059f60261895877fb18a" />
+  <document id="https://example.invalid/exosett/Hall" revision="1" path="Hall-1.xml" sha256="abaf6d883638e7e4126602e0328cf802c2b777a88c9ee01b6ee09f1116226368" />
+  <document id="https://example.invalid/exosett/Workshop" revision="1" path="Workshop-1.xml" sha256="13c989ba8b01f468bc581b633b1fd67c90a916db96339fad2f758ae8ddb8d5fd" />
+</catalogue>

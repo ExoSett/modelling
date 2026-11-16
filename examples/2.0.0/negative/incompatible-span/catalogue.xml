@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<catalogue version="1">
+  <artifact id="https://example.invalid/exosett/evidence/work-record" path="work-record.txt" sha256="53b45ad3d018b84657270e129cf8b1fa53c1498ccc6ee9d85269edaad9e8bc45" />
+  <document id="https://example.invalid/exosett/SupplierA" revision="1" path="SupplierA-1.xml" sha256="93427604c139dd38cd58be4057e18fdc6e8d2bc32f59cd1e2c798ec3ee88fb71" />
+  <document id="https://example.invalid/exosett/SupplierB" revision="1" path="SupplierB-1.xml" sha256="fe106928874898e75217bc3e2d64bc04dea43caeeccd11acee4005aecedc6543" />
+  <document id="https://example.invalid/exosett/Selection" revision="1" path="Selection-1.xml" sha256="ab70d38463c80ea815e136941820d0af868971b25fa6d5648f52011b40eb602c" />
+</catalogue>

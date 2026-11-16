@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:m="https://www.exosett.com/xml/model" targetNamespace="https://www.exosett.com/xml/model" elementFormDefault="qualified" version="2.0.0">
+  <xs:complexType name="Realization">
+    <xs:sequence>
+      <xs:element name="predecessor" type="m:Local" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="design" type="m:Ref"/>
+      <xs:element name="component" type="m:Ref" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:ID" use="required"/>
+    <xs:attribute name="state" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="occupied"/>
+          <xs:enumeration value="unoccupied"/>
+          <xs:enumeration value="unknown"/>
+          <xs:enumeration value="group"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="continuity">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="unchanged"/>
+          <xs:enumeration value="renamed"/>
+          <xs:enumeration value="modified"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="Building">
+    <xs:sequence>
+      <xs:element name="metadata" type="m:Metadata"/>
+      <xs:element name="design" type="m:Ref"/>
+      <xs:element name="assessment" type="m:Assessment"/>
+      <xs:element name="position" type="m:Realization" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="retired" type="m:Local" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="m:Identity"/>
+    <xs:attribute name="building" type="xs:anyURI" use="required"/>
+  </xs:complexType>
+</xs:schema>

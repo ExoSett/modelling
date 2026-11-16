@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='utf-8'?>
+<buildingInstance xmlns="https://www.exosett.com/xml/model" id="https://example.invalid/exosett/A" revision="1" formatVersion="2.0.0" building="https://example.invalid/exosett/physical-building-A">
+  <metadata recorded="2026-11-01T12:00:00Z" author="https://example.invalid/exosett/people/checker" effective="2026-10-01" observed="2026-10-01">
+    <change>Fictional worked example: A revision 1</change>
+    <evidence artifact="https://example.invalid/exosett/evidence/work-record" subject="$document" role="illustrative-work-and-inspection" />
+  </metadata>
+  <design document="https://example.invalid/exosett/Hall" revision="1" />
+  <assessment status="not-assessed" />
+  <position id="slot" state="occupied">
+    <design document="https://example.invalid/exosett/Hall" revision="1" target="p-1" />
+    <component document="https://example.invalid/exosett/C" revision="1" />
+  </position>
+</buildingInstance>

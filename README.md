@@ -10,10 +10,12 @@ Its proposed information architecture distinguishes three complementary records:
 Component classes belong within Building Class Documents. Physical instances
 reference those definitions without confusing a design position with its occupant.
 
-The implemented XML format remains **1.0.0**. Its term *building specification*
-describes the combined project record of what the design team defines for the
-Site Office to execute. The three-document architecture is the proposed direction
-for **2.0.0**, not functionality already implemented by the current schema or tools.
+The retained **1.0.0** XML format uses *building specification* for the combined
+project record of what the design team defines for the Site Office to execute.
+An experimental **2.0.0 prototype** now implements the three-document architecture,
+supporting publication sets, XML fixtures and structural/semantic validation.
+It is a candidate contract for review, not a declaration that the format is final.
+Sketch continues to use 1.0.0.
 
 This role is distinct from the sibling `ExoSett/website` repository: the website presents ExoSett publicly, while this repository owns modelling formats and tools. Applications may later be published through the website without moving their source or specifications there.
 
@@ -23,18 +25,39 @@ This role is distinct from the sibling `ExoSett/website` repository: the website
 - [`docs/information-model-examples.md`](docs/information-model-examples.md) — illustrative snapshots and scenarios, not schema-valid XML
 - [`docs/information-model-standards.md`](docs/information-model-standards.md) — standards alignment and questions for further investigation
 - [`docs/implementation-plan-2.0.0.md`](docs/implementation-plan-2.0.0.md) — bounded implementation proposal and review checkpoint before schema changes
+- [`docs/format-2.0.0.md`](docs/format-2.0.0.md) — prototype XML contract and validation commands
+- [`docs/prototype-2.0.0-findings.md`](docs/prototype-2.0.0-findings.md) — implementation decisions, discoveries and limits
 - [`docs/format.md`](docs/format.md) — scope and design of the building specification format
 - [`docs/versioning.md`](docs/versioning.md) — schema and building specification versioning policy
-- [`schema/exosett-model-1.0.0.xsd`](schema/exosett-model-1.0.0.xsd) — current XML Schema
-- [`examples/`](examples/) — small, validating building specifications
+- [`schema/exosett-model-1.0.0.xsd`](schema/exosett-model-1.0.0.xsd) — retained 1.0.0 XML Schema
+- [`schema/exosett-model-2.0.0.xsd`](schema/exosett-model-2.0.0.xsd) — three-document prototype schema
+- [`schema/exosett-publication-2.0.0.xsd`](schema/exosett-publication-2.0.0.xsd) — supporting publication-set schema
+- [`examples/`](examples/) — retained 1.0.0 building specifications
+- [`examples/2.0.0/README.md`](examples/2.0.0/README.md) — executable positive/negative prototype examples
 - [`sketch/README.md`](sketch/README.md) — lightweight static ExoSett Sketch application
 
-The current schema is deliberately limited. It can describe multiple placed frame pairs, abstract module types, and module placements. It is expected to evolve through practical use and feedback rather than attempt to define every area in advance. Validation against it does not certify structural soundness, manufacturability, regulatory compliance, or fitness for any purpose.
+Both formats are deliberately limited and will evolve through practical use.
+Validation checks recorded structure and consistency; it does not certify
+structural soundness, manufacturability, regulatory compliance or physical reality.
 
-The proposed information architecture is a documentation-stage evolution of this
-format. It does not change version 1.0.0, reinterpret existing XML as physical
-asset records, or implement imports or new document categories. Schema changes
-will follow a separate review of the architecture and worked examples.
+The prototype does not reinterpret existing XML as physical asset records or
+silently upgrade it. Version 1.0.0 schemas, examples and Sketch remain unchanged.
+
+## Validate the prototype
+
+Requires Python 3.10+ and `xmllint` (libxml2), with no third-party Python packages.
+From the repository root:
+
+```sh
+python3 scripts/check_models.py
+python3 scripts/validate_model.py examples/2.0.0/positive/07-extension/catalogue.xml
+```
+
+The first command runs acceptance tests, positive/negative fixture checks and
+legacy validation, retaining JSON and a test log under `test-results/`. Use
+`--report PATH` to choose another portable output location. The second command
+returns JSON diagnostics and exits nonzero on invalid or unresolved records.
+Explicit unknowns and prepared/incomplete coordination are reported separately.
 
 ## Implemented 1.0.0 building specification lifecycle
 

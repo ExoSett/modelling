@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:m="https://www.exosett.com/xml/model" targetNamespace="https://www.exosett.com/xml/model" elementFormDefault="qualified" version="2.0.0">
+  <xs:complexType name="PhysicalIdentity">
+    <xs:attribute name="scheme" type="xs:anyURI" use="required"/>
+    <xs:attribute name="issuer" type="xs:anyURI" use="required"/>
+    <xs:attribute name="value" type="m:Text" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="State">
+    <xs:sequence>
+      <xs:element name="location" type="m:Location" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="kind" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="installed"/>
+          <xs:enumeration value="storage"/>
+          <xs:enumeration value="transit"/>
+          <xs:enumeration value="repair"/>
+          <xs:enumeration value="unknown"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="context" type="m:Text"/>
+  </xs:complexType>
+  <xs:complexType name="Component">
+    <xs:sequence>
+      <xs:element name="metadata" type="m:Metadata"/>
+      <xs:element name="identity" type="m:PhysicalIdentity"/>
+      <xs:element name="class" type="m:Ref"/>
+      <xs:element name="state" type="m:State"/>
+      <xs:element name="condition" type="m:Text"/>
+      <xs:element name="assessment" type="m:Assessment"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="m:Identity"/>
+  </xs:complexType>
+</xs:schema>

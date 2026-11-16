@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='utf-8'?>
+<buildingClass xmlns="https://www.exosett.com/xml/model" id="https://example.invalid/exosett/SupplierB" revision="1" formatVersion="2.0.0" scope="definitions-only">
+  <metadata recorded="2026-11-01T12:00:00Z" author="https://example.invalid/exosett/people/checker" observed="2026-10-01">
+    <change>Fictional worked example: SupplierB revision 1</change>
+    <evidence artifact="https://example.invalid/exosett/evidence/work-record" subject="$document" role="illustrative-work-and-inspection" />
+  </metadata>
+  <purpose>Explicit alternative beam</purpose>
+  <definition id="beam" kind="beam">
+    <description>Illustrative assertions only; not engineering certification.</description>
+    <dimensions width="0.2" height="0.4" depth="4" unit="m" />
+    <maxSpan value="6" unit="m" />
+  </definition>
+</buildingClass>

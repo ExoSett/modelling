@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<buildingClass xmlns="https://www.exosett.com/xml/model" id="https://example.invalid/exosett/FrameLibrary" revision="1" formatVersion="2.0.0" scope="definitions-only">
+  <metadata recorded="2026-11-01T12:00:00Z" author="https://example.invalid/exosett/people/checker" observed="2026-10-01">
+    <change>Fictional worked example: FrameLibrary revision 1</change>
+    <evidence artifact="https://example.invalid/exosett/evidence/work-record" subject="$document" role="illustrative-work-and-inspection" />
+  </metadata>
+  <purpose>Illustrative shared service-frame assembly</purpose>
+  <definition id="service-frame" kind="service-frame">
+    <description>Illustrative assertions only; not engineering certification.</description>
+    <dimensions width="6" height="3" depth="1.6" unit="m" />
+  </definition>
+</buildingClass>

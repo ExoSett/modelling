@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<catalogue version="1">
+  <artifact id="https://example.invalid/exosett/evidence/work-record" path="work-record.txt" sha256="53b45ad3d018b84657270e129cf8b1fa53c1498ccc6ee9d85269edaad9e8bc45" />
+  <document id="https://example.invalid/exosett/InterfaceLibrary" revision="2" path="InterfaceLibrary-2.xml" sha256="53322339e5b200c2c542e1e565c1be214d96f83e9263c0bd509c0acf2c8ffe7f" />
+  <document id="https://example.invalid/exosett/BeamLibrary" revision="5" path="BeamLibrary-5.xml" sha256="9a7efe2f4dc9610843d30f2dfe344aecdb7f74b54147059f60261895877fb18a" />
+  <document id="https://example.invalid/exosett/PodLibrary" revision="1" path="PodLibrary-1.xml" sha256="fed4932081af654c13f4766d097a0c6d97e2108eb932f39b971af39d3c57d70c" />
+  <document id="https://example.invalid/exosett/Expandable" revision="1" path="Expandable-1.xml" sha256="38d8d21df4b4334137c978b2b7993aaa51c8d26dd6fd50c3f54d1bb9db8b3123" />
+  <document id="https://example.invalid/exosett/Expandable" revision="2" path="Expandable-2.xml" sha256="aade9686cba9571b2d08d96200421063b2ca1d683bd4864900af6125b3084db3" />
+  <document id="https://example.invalid/exosett/E" revision="1" path="E-1.xml" sha256="c42fcac11e079bfa9f75c0e2b8fd0d3ab55274b6e46da8d140e8c236e53e72fd" />
+  <document id="https://example.invalid/exosett/F" revision="1" path="F-1.xml" sha256="2194c2486dfcd2900f92b7d2d64512ff35dec4c28ca8c1dd6b2164ccefed8e8a" />
+  <document id="https://example.invalid/exosett/E1" revision="1" path="E1-1.xml" sha256="8cba3906754b53b2e02450230b5a891ccdfc93b223fcc24c25001f685621cd6d" />
+  <document id="https://example.invalid/exosett/E2" revision="1" path="E2-1.xml" sha256="984215f406199755286d9e2d1aed07bc02f23e06cdc4efde72b3c5538de3a1c9" />
+  <document id="https://example.invalid/exosett/E3" revision="1" path="E3-1.xml" sha256="fcd0510d785d8311437ab223635b79d048922c14d3a5d9cf7b1edc01a725e521" />
+  <document id="https://example.invalid/exosett/F1" revision="1" path="F1-1.xml" sha256="f275973c298cd6f56ecfc257007ccc6797433cf1a9e74c21cb952f13256769a0" />
+  <document id="https://example.invalid/exosett/F2" revision="1" path="F2-1.xml" sha256="acbcef09fbc297187e3a8af9e3e6a05c3956505b9e3dd4d1a869c3fdf20b8b64" />
+  <document id="https://example.invalid/exosett/F3" revision="1" path="F3-1.xml" sha256="5fb5bb3d74a691ec07b521fd2445ae1bb7ecdaad0178c0620d14ef0fcce00b6b" />
+  <document id="https://example.invalid/exosett/E4" revision="1" path="E4-1.xml" sha256="1ee09d881c966ba5c865ba3b03f76b55871a65cf8f6af218a473645843a2d7e3" />
+  <document id="https://example.invalid/exosett/E5" revision="1" path="E5-1.xml" sha256="3e011a7291b764c7572393df0eea2a04869d61e405afa086577c55c73fdd70a5" />
+  <document id="https://example.invalid/exosett/BeforeExtension" revision="1" path="BeforeExtension-1.xml" sha256="9e4c3413eb5a0ae8716b94a7c06dc5ebfcc03392bfb09c3932d0db171d3f5666" />
+  <document id="https://example.invalid/exosett/E" revision="2" path="E-2.xml" sha256="3ffb208c1b451cdb3d7c3b3e5dce3ccf14a2b27a1610e222826674f78f40bd03" />
+  <document id="https://example.invalid/exosett/E4" revision="2" path="E4-2.xml" sha256="22a807512739140e44c0017304594e95146ffdf5b6b0a570bfcdf4f602cfd6eb" />
+  <document id="https://example.invalid/exosett/E5" revision="2" path="E5-2.xml" sha256="39d0034837b8ffcf5052e4930b1da5f315077bd018a7d16f1c6b1ed5099af96f" />
+  <document id="https://example.invalid/exosett/Extension" revision="1" path="Extension-1.xml" sha256="21ac096eb2ab20faf3c28543009ce6d3e6aa422bc4bdec150130cbddf8518fc9" />
+</catalogue>

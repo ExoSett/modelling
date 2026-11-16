@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='utf-8'?>
+<componentInstance xmlns="https://www.exosett.com/xml/model" id="https://example.invalid/exosett/C" revision="4" formatVersion="2.0.0">
+  <metadata recorded="2026-11-01T12:00:00Z" author="https://example.invalid/exosett/people/checker" effective="2026-10-06" observed="2026-10-06">
+    <change>Fictional worked example: C revision 4</change>
+    <previous document="https://example.invalid/exosett/C" revision="3" />
+    <evidence artifact="https://example.invalid/exosett/evidence/work-record" subject="$document" role="illustrative-work-and-inspection" />
+  </metadata>
+  <identity scheme="https://example.invalid/exosett/fictional-supplier-serial-scheme" issuer="https://example.invalid/exosett/fictional-supplier" value="C" />
+  <class document="https://example.invalid/exosett/BeamLibrary" revision="5" target="beam" />
+  <state kind="installed">
+    <location building="https://example.invalid/exosett/physical-building-B" position="slot" />
+  </state>
+  <condition>Illustrative inspection recorded; no engineering assessment</condition>
+  <assessment status="not-assessed" />
+</componentInstance>

@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<catalogue version="1">
+  <artifact id="https://example.invalid/exosett/evidence/work-record" path="work-record.txt" sha256="53b45ad3d018b84657270e129cf8b1fa53c1498ccc6ee9d85269edaad9e8bc45" />
+  <document id="https://example.invalid/exosett/InterfaceLibrary" revision="2" path="InterfaceLibrary-2.xml" sha256="53322339e5b200c2c542e1e565c1be214d96f83e9263c0bd509c0acf2c8ffe7f" />
+  <document id="https://example.invalid/exosett/BeamLibrary" revision="5" path="BeamLibrary-5.xml" sha256="9a7efe2f4dc9610843d30f2dfe344aecdb7f74b54147059f60261895877fb18a" />
+  <document id="https://example.invalid/exosett/Hall" revision="1" path="Hall-1.xml" sha256="abaf6d883638e7e4126602e0328cf802c2b777a88c9ee01b6ee09f1116226368" />
+  <document id="https://example.invalid/exosett/Workshop" revision="1" path="Workshop-1.xml" sha256="13c989ba8b01f468bc581b633b1fd67c90a916db96339fad2f758ae8ddb8d5fd" />
+  <document id="https://example.invalid/exosett/X" revision="1" path="X-1.xml" sha256="39e143bbec169d7a68a6afd41b56afdefb70f9da45c2f30058986425a48bec65" />
+  <document id="https://example.invalid/exosett/D" revision="1" path="D-1.xml" sha256="d179b592881679487ccb459d664712859a0b1806025ea798dac0cf8be7690bf8" />
+  <document id="https://example.invalid/exosett/C" revision="1" path="C-1.xml" sha256="a683fe864685c532c7b78a9641640b3e4e8f3ddf1ca311cef9f9fda6b5b3eaef" />
+  <document id="https://example.invalid/exosett/Original" revision="1" path="Original-1.xml" sha256="fde814d3633248c9070c44f8ac7d33790c966929c7a39267484ee1b77d52151e" />
+  <document id="https://example.invalid/exosett/X" revision="2" path="X-2.xml" sha256="bac12e0474ea55079445338a21cb246bd1ad191980f211ffad23ba75f888b61c" />
+  <document id="https://example.invalid/exosett/C" revision="2" path="C-2.xml" sha256="3009f8180d3a62ff3c1bb0557dac9577a43f281e2e960fb1888b56bd0ab226aa" />
+  <document id="https://example.invalid/exosett/D" revision="2" path="D-2.xml" sha256="e12929a5a6610e47163b2e9d29c10d4a4e4ad2d5849d93e46e1a8913dc2a07af" />
+  <document id="https://example.invalid/exosett/Correction" revision="1" path="Correction-1.xml" sha256="3e61eb178653bb158d067c826da5681cba4fb8a298eeaf110c54f67232a93f44" />
+</catalogue>
