@@ -175,6 +175,66 @@ Name resolution and engineering compatibility are distinct checks. An exact
 duplicate dependency can resolve to the same original definition without
 inventing a new class or choosing a newer revision.
 
+## 7. Extend a building from three bays to five
+
+This example is independent of the previous scenarios. `ExpandableClass@1`
+describes three bays. Buildings E and F both adopt it, but each has its own
+realizations of those class positions. The labels below are illustrative stable
+keys, not a prescribed identifier or reference-designation syntax.
+
+| Class-position identity | Designation in class revision 1 | Designation in class revision 2 | Continuity decision |
+| --- | --- | --- | --- |
+| p-a | Bay 1 | Bay 1 | Unchanged |
+| p-b | Bay 2 | Bay 2 | Unchanged |
+| p-c | Bay 3 | East Bay | Same position, renamed; no geometric change |
+| p-d | Not present | Bay 4 | New position |
+| p-e | Not present | Bay 5 | New position |
+
+`ExpandableClass@2` adds the two bays beyond the existing arrangement. This
+example assumes an engineered extension that leaves the three existing pod
+installations physically unchanged; it does not establish structural feasibility.
+Each bay has one pod position for this illustration. Structural member positions
+and their inventories are omitted rather than assumed absent.
+
+| Building E position identity | Building-E@1 design reference | Building-E@2 design reference | Occupant after extension |
+| --- | --- | --- | --- |
+| e-a | ExpandableClass@1 / p-a | ExpandableClass@2 / p-a | Physical pod E1, unchanged |
+| e-b | ExpandableClass@1 / p-b | ExpandableClass@2 / p-b | Physical pod E2, unchanged |
+| e-c | ExpandableClass@1 / p-c | ExpandableClass@2 / p-c | Physical pod E3, unchanged; displayed designation now East Bay |
+| e-d | Not present | ExpandableClass@2 / p-d | Physical pod E4, newly installed |
+| e-e | Not present | ExpandableClass@2 / p-e | Physical pod E5, newly installed |
+
+Before the extension, Component-E1@1 through Component-E3@1 record installation
+at E/e-a through E/e-c. Component-E4@1 and Component-E5@1 record storage. Their
+physical identities and component-class references are independent of these labels.
+
+The accepted set Extension-1 records Building-E@2 explicitly adopting
+ExpandableClass@2, the resulting five-bay configuration, continuity decisions and
+work/inspection evidence. It also records Component-E4@2 and Component-E5@2 moving
+from storage to E/e-d and E/e-e. Existing component records still reference the
+same stable building positions; E1, E2 and E3 need no new revisions solely because
+the building adopted a new class revision or displayed a new designation. The
+building retains the component revisions supporting those unchanged installations.
+If actual extension work changes their condition, support or other recorded
+circumstances, those components do require appropriate new revisions and checks.
+
+Building-F@1 continues adopting ExpandableClass@1 with three distinct building
+positions f-a, f-b and f-c. These realize the same class positions as E originally
+did, but are not E's positions and have their own physical occupants. Publishing
+ExpandableClass@2 or Building-E@2 does not update F.
+
+For later reconfiguration, renaming preserves identity; movement/modification
+requires an explicit continuity decision. Splits/merges create new identities
+linked to predecessors, and retired position identities cannot be reused. Those
+rules do not imply that a component occupying a retired position is itself retired.
+This example does not implement every split, merge or structural transformation.
+
+**Check:** E has five realized bays while F retains three. The renamed bay keeps
+both its class-position identity and E realization identity. New bays gain new
+identities. Name-based matching must not join E/e-c to F/f-c or infer a physical
+component change. Validate only the declared illustrative scope, not an invented
+complete inventory of structural works.
+
 ## Outcomes for review
 
 These scenarios require immutable, qualified references and clear snapshot
@@ -186,4 +246,5 @@ The important remaining choices are recorded in the architecture's review
 checkpoint: reference syntax and resolution, scope/validation, time and correction
 fields, coordinated acceptance, assignment cardinality and compatibility with the
 existing format. The examples should become acceptance fixtures only after those
-choices are reviewed.
+choices are reviewed. The [2.0.0 plan](implementation-plan-2.0.0.md) maps all seven
+scenarios to positive and negative acceptance cases.

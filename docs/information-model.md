@@ -42,7 +42,9 @@ purpose is not excused by calling it a fragment.
 | Document identity | The continuing record across revisions; independent of its filename or host |
 | Revision identity | One immutable version of that record; distinct from the schema version |
 | Class-definition identity | A definition within a class document; interpretation also identifies the containing immutable revision |
-| Position identity/reference designation | An occurrence or role in a design/system, qualified by its context; not a serial number or merely a coordinate |
+| Class-position identity | A continuing design occurrence within a class-document lineage; distinct from its name and coordinates |
+| Building-position identity | One building's realization of a design position; distinct from realizations in other buildings |
+| Reference designation | A designation within a stated system/revision; it may change without changing position identity |
 | Physical-component identity | The enduring identity of a manufactured item, independent of its document revisions or current building |
 
 An instance adopts a particular Building Class Document revision as its design
@@ -52,6 +54,14 @@ The component in turn identifies its class definition and exact design revision.
 The same design position can be realized in many buildings: a bare position name
 is not globally unique. Replacement changes the occupant without changing that
 position's identity.
+
+Renaming or renumbering alone does not create a new position. Moving or modifying
+a position requires an explicit continuity decision. Splitting or merging creates
+new position identities with predecessor relationships; removal retires an identity
+and it must not be recycled. These are position rules, not physical-component
+repair identity rules. Continuity must not be inferred from matching names or
+coordinates. A building explicitly adopts a new class revision and maps its own
+positions to it; other buildings remain on their previously adopted revisions.
 
 Design basis, assessed conformity and approved deviations are separate. Adopting
 a design is not proof of conformance. Positions can be unfilled or their occupants
@@ -72,6 +82,10 @@ A mutable discovery service may help find a revision, but `latest` cannot be the
 meaning of an issued design dependency. Historical interpretation must retain
 access to the dependency contents and the applicable schema and semantic rules.
 Storage location alone does not establish immutability or integrity.
+
+Importing makes definitions available; explicit use references determine which
+definitions participate in the design. Importing a library does not install or
+instantiate all its contents.
 
 Composition connects imported definitions to local positions, interfaces and
 requirements. Qualified references or explicit aliases distinguish definitions
@@ -188,7 +202,7 @@ does not require implementing a full document editor in Sketch.
 
 ## Findings and review checkpoint
 
-The [six scenarios](information-model-examples.md) support the three concepts.
+The [seven scenarios](information-model-examples.md) support the three concepts.
 They expose no need for a fourth component-class category or an internal mutable
 event log. They do expose distinctions that schema work must preserve: qualified
 positions, physical identity, correction versus physical change, and explicit
@@ -228,4 +242,6 @@ a scenario exceeds the initial supported scope.
 6. Adapt tool import/export boundaries only as a separately scoped change, following
    the existing release requirements if Sketch or website integration is affected.
 
-Stop at this documentation review checkpoint before implementing schemas.
+The [2.0.0 implementation plan](implementation-plan-2.0.0.md) now proposes concrete
+representations and a bounded sequence for these decisions. Stop at that review
+checkpoint before implementing schemas.

@@ -1,6 +1,19 @@
 # ExoSett modelling
 
-This repository defines and implements ways to describe and work with ExoSett building models. It is the home of the common ExoSett XML Schema, examples, modelling documentation, and applications that produce or consume the format. An XML document conforming to the schema is an ExoSett building specification: the machine-readable project record of what the design team defines for the Site Office to execute.
+This repository owns ExoSett modelling formats, examples, documentation and tools.
+Its proposed information architecture distinguishes three complementary records:
+
+- **Building Class Document:** reusable building and component definitions, design positions and requirements; it may describe only a limited part of a building.
+- **Building Instance Document:** one physical building's recorded configuration, adopted design revision and assignments of physical components to positions.
+- **Component Instance Document:** one physical component's identity and recorded state throughout manufacture, installation, removal, repair and reuse.
+
+Component classes belong within Building Class Documents. Physical instances
+reference those definitions without confusing a design position with its occupant.
+
+The implemented XML format remains **1.0.0**. Its term *building specification*
+describes the combined project record of what the design team defines for the
+Site Office to execute. The three-document architecture is the proposed direction
+for **2.0.0**, not functionality already implemented by the current schema or tools.
 
 This role is distinct from the sibling `ExoSett/website` repository: the website presents ExoSett publicly, while this repository owns modelling formats and tools. Applications may later be published through the website without moving their source or specifications there.
 
@@ -9,6 +22,7 @@ This role is distinct from the sibling `ExoSett/website` repository: the website
 - [`docs/information-model.md`](docs/information-model.md) — proposed three-document architecture, review findings and next steps
 - [`docs/information-model-examples.md`](docs/information-model-examples.md) — illustrative snapshots and scenarios, not schema-valid XML
 - [`docs/information-model-standards.md`](docs/information-model-standards.md) — standards alignment and questions for further investigation
+- [`docs/implementation-plan-2.0.0.md`](docs/implementation-plan-2.0.0.md) — bounded implementation proposal and review checkpoint before schema changes
 - [`docs/format.md`](docs/format.md) — scope and design of the building specification format
 - [`docs/versioning.md`](docs/versioning.md) — schema and building specification versioning policy
 - [`schema/exosett-model-1.0.0.xsd`](schema/exosett-model-1.0.0.xsd) — current XML Schema
@@ -22,7 +36,7 @@ format. It does not change version 1.0.0, reinterpret existing XML as physical
 asset records, or implement imports or new document categories. Schema changes
 will follow a separate review of the architecture and worked examples.
 
-## Building specification lifecycle
+## Implemented 1.0.0 building specification lifecycle
 
 The building specification is an important project artifact from the beginning of an ExoSett project. A project may start with a simple XML document produced by ExoSett Sketch, but Sketch is not the only way to create one. The design team maintains and develops the specification, identifies and coordinates missing information, and records the project definition as it develops. The Site Office executes what the specification defines and contributes operational changes and feedback to the maintained project record. The specification continues to be maintained as the project and completed building change.
 
@@ -32,7 +46,7 @@ Each distinctly managed building project should have its own Git repository, wit
 
 The ExoSett website is intended eventually to include prompts on its role pages for AI assistance suited to each participant's responsibilities. These will be role-specific rather than one generic prompt: for example, a Building Designer may develop and coordinate the overall definition, a Module Designer may assess and refine the inputs needed for module design, and the Site Office may interpret and execute the maintained specification.
 
-AI will be an assistant, not the source of truth. The building specification remains the project record. An assistant should work with the schema version declared by the document, take account of the user's role, identify missing or incompatible information, and avoid inventing unsupported XML or silently changing schema version. It may help interpret an older specification or support a deliberate migration, but migration is neither mandatory nor automatically directed to the latest schema version.
+AI will be an assistant, not the source of truth. Maintained documents remain the records used by the responsible people. An assistant should work with the schema version declared by a document, take account of the user's role, identify missing or incompatible information, and avoid inventing unsupported XML or silently changing schema version. It may help interpret an older specification or support a deliberate migration, but migration is neither mandatory nor automatically directed to the latest schema version.
 
 To validate the examples on a system with `xmllint` (included with macOS and commonly available on Unix-like systems):
 
